@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<con:soapui-project xmlns:con="http://eviware.com/soapui/config" id="6639e8dd-31e1-4661-a745-7e9e9a757bb3" created="4.3.0" activeEnvironment="Local" encryptionMode="Not encrypted" name="Arazzo-API-WF" projectVersion="" updated="4.3.0" compositeProjectFormat="1.3">
+<con:soapui-project xmlns:con="http://eviware.com/soapui/config" id="6639e8dd-31e1-4661-a745-7e9e9a757bb3" created="4.3.0" activeEnvironment="Local" encryptionMode="Not encrypted" name="Arazzo-API-WorkFlow" projectVersion="" updated="4.3.0" compositeProjectFormat="1.3">
   <con:settings>
     <con:setting id="6639e8dd-31e1-4661-a745-7e9e9a757bb3fileName">Arazzo-API-WF</con:setting>
   </con:settings>
