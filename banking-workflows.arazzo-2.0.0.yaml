@@ -1,0 +1,780 @@
+arazzo: 1.0.1
+info:
+  title: Stateful Banking API Workflows
+  version: 2.0.0
+  summary: Multi-API journeys with pagination, token rotation, polling, and business assertions
+  description: |
+    Six independently configured workflows for an isolated, stateful test service.
+    Standard Arazzo fields describe calls, dependencies, criteria, conditional
+    navigation, and bounded polling retries. x-readyapi-* extensions are explicit,
+    mandatory test-generation requirements, NOT native Arazzo or built-in ReadyAPI
+    configuration. A generator must translate them into properties, scripts,
+    assertions, control flow, and teardown, or report unsupported capabilities.
+    A generic Arazzo runner that ignores extensions does not implement the full
+    scenario: in particular pagination state, refreshed-token substitution,
+    arithmetic assertions, aggregate outputs, and finally-style cleanup.
+    No service is deployed by these files. Do not use static OpenAPI auto-mocks
+    as evidence of stateful business behavior or execute against production.
+sourceDescriptions:
+  - name: authApi
+    url: ./BearerAuthenticationAPI-2.0.0.yaml
+    type: openapi
+  - name: bankingApi
+    url: ./banking-management-api-2.0.0.yaml
+    type: openapi
+
+x-readyapi-execution:
+  extensionVersion: 1.0.0
+  targetSuite: Banking Workflows v2
+  generation:
+    - Create one Test Case per workflow and preserve the original v1 suite.
+    - Create actual input and output properties, not only property references.
+    - Keep credentials unset; source them securely at execution time.
+    - Validate required inputs, types, enums, and cross-field preconditions before login.
+    - Validate every response against its status-specific OpenAPI schema.
+    - Preserve JSON string escaping and integer types when building request bodies.
+    - Configure authApi and bankingApi base URLs independently from test data.
+    - Omit optional query parameters whose inputs are unset; never send literal null.
+    - Run cases sequentially against dedicated fixtures; do not share mutable fixtures concurrently.
+    - Never log token values or credentials, including request and response dumps.
+    - Stop with a capability report if MCP cannot create the necessary script or property assets.
+  fixtures:
+    - Provision credentials for a customer that owns all accounts used by a case.
+    - Reset mutable fixtures before each run; no fixture-provisioning endpoint is defined here.
+    - Use a fresh accountId for createAccount and a fresh idempotencyKey for each transfer case run.
+    - For updateAccount closing, supply an account with zero balance and no pending transfers.
+    - For transfers, use distinct active same-currency accounts with no other writers or pending reservations.
+    - For pagination coverage, seed at least three accounts and three dated transactions, and use pageSize 2.
+    - For expiry-recovery coverage, configure the test service to expire one protected request before processing it.
+  auth:
+    stateScope: test-case
+    initializeAfter: login
+    capture:
+      accessToken: $response.body#/access_token
+      refreshToken: $response.body#/refresh_token
+      sessionId: $response.body#/session_id
+    requestOverrides:
+      protectedBankingAuthorization: Use Bearer followed by the latest state accessToken.
+      logoutBodyToken: Use the latest state refreshToken, not the original login value.
+      revokedProbeRefreshToken: For verifyRevokedRefresh, use the latest refresh token captured before logout.
+    refresh:
+      when: HTTP 401 AND response code TOKEN_EXPIRED on a protected banking request.
+      operationId: $sourceDescriptions.authApi.refreshSession
+      requestBody: Send refresh_token from the latest state refreshToken.
+      maxAttemptsPerStepPerCaseRun: 1
+      success:
+        - Require HTTP 200 and the TokenResponse schema.
+        - Require the same session_id and different nonempty access_token and refresh_token.
+        - Replace both state tokens atomically, then replay only the failed request.
+        - Preserve the URL, body, cursor, and Idempotency-Key on replay.
+      failure:
+        - Do not refresh on INVALID_TOKEN, SESSION_REVOKED, other status codes, or business errors.
+        - Do not retry refresh after an ambiguous transport failure.
+        - Fail visibly if refresh or its replay fails; do not reset its budget during polling or pagination.
+    explicitRotation:
+      step: refreshTokens
+      action: Apply the same token checks and atomic state replacement as refresh success.
+    precedence: Recovery handles TOKEN_EXPIRED before polling failure actions; neither resets the other's budget.
+  pagination:
+    maxSuccessfulPagesPerStep: 10
+    initialCursor: ''
+    cursorParameter: cursor
+    nextCursorPointer: /nextCursor
+    itemsPointer: /items
+    behavior:
+      - On first execution inject an empty cursor; on each goto inject the previous nextCursor.
+      - Preserve all original filters and page size across pages and authentication recovery.
+      - Validate and append each successful page exactly once; a 401 never appends items.
+      - Require nextCursor to be null or a nonempty string.
+      - Fail if a nonnull cursor repeats or if a request for page 11 would be needed.
+      - Fail on duplicate item IDs across pages; do not silently deduplicate.
+      - Clear cursor, page count, and accumulator at the start of every Test Case run.
+  polling:
+    behavior:
+      - Poll only while the transfer is pending; failed and unknown states fail immediately.
+      - Five retries means at most six logical polling attempts including the initial attempt.
+      - Use Retry-After when supplied, otherwise the declared retryAfter delay.
+      - Enforce a 30-second polling deadline even if Retry-After would exceed it.
+      - Never resubmit a transfer to recover from a polling failure.
+  cleanup:
+    behavior:
+      - Install a finally-style teardown once login creates a session.
+      - Attempt logout once on unexpected failure using the latest refresh token.
+      - Skip teardown logout if the normal logout already succeeded.
+      - Preserve the original failure; record a teardown error separately without masking it.
+      - Do not attempt logout if login failed before creating a session.
+      - Disable refresh for post-logout negative probes; revocation must not be bypassed.
+  assertions:
+    identityComparison: Compare all account IDs, customer IDs, transfer IDs, session IDs, and tokens case-sensitively.
+    notation: |
+      x-readyapi-assertions are mandatory natural-language invariants, not
+      Arazzo conditions. Translate them into executable checks (for example
+      Groovy assertions) using typed inputs and parsed step responses. Arithmetic,
+      collection quantification, and exact case-sensitive identity checks belong
+      here rather than in unsupported Arazzo simple expressions.
+
+components:
+  inputs:
+    credentials:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          format: password
+          minLength: 1
+    accountContext:
+      allOf:
+        - $ref: '#/components/inputs/credentials'
+        - type: object
+          required: [accountId]
+          properties:
+            accountId:
+              type: string
+              minLength: 1
+    transferInputs:
+      allOf:
+        - $ref: '#/components/inputs/credentials'
+        - type: object
+          required: [sourceAccountId, destinationAccountId, amountMinor, currency, idempotencyKey]
+          properties:
+            sourceAccountId:
+              type: string
+              minLength: 1
+            destinationAccountId:
+              type: string
+              minLength: 1
+            amountMinor:
+              type: integer
+              minimum: 1
+              maximum: 9007199254740991
+            currency:
+              type: string
+              enum: [EUR, USD, GBP]
+            idempotencyKey:
+              type: string
+              minLength: 1
+              maxLength: 128
+  parameters:
+    authorization:
+      name: Authorization
+      in: header
+      value: 'Bearer {$steps.login.outputs.accessToken}'
+    accountId:
+      name: accountId
+      in: path
+      value: $inputs.accountId
+    accountQuery:
+      name: accountId
+      in: query
+      value: $inputs.accountId
+    sourceQuery:
+      name: accountId
+      in: query
+      value: $inputs.sourceAccountId
+    destinationQuery:
+      name: accountId
+      in: query
+      value: $inputs.destinationAccountId
+    pageSize:
+      name: limit
+      in: query
+      value: $inputs.pageSize
+    cursor:
+      name: cursor
+      in: query
+      value: ''
+
+workflows:
+  - workflowId: listCustomerAccounts
+    summary: Collect all customer accounts and validate ownership across pages
+    inputs:
+      allOf:
+        - $ref: '#/components/inputs/credentials'
+        - type: object
+          required: [customerId]
+          properties:
+            customerId:
+              type: string
+              minLength: 1
+            pageSize:
+              type: integer
+              minimum: 1
+              maximum: 100
+              default: 2
+    steps:
+      - &login
+        stepId: login
+        operationId: $sourceDescriptions.authApi.loginUser
+        requestBody:
+          contentType: application/json
+          payload:
+            username: $inputs.username
+            password: $inputs.password
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/token_type == 'Bearer'
+          - condition: $response.body#/expires_in > 0
+        outputs:
+          accessToken: $response.body#/access_token
+          refreshToken: $response.body#/refresh_token
+          sessionId: $response.body#/session_id
+      - stepId: getAccounts
+        operationId: $sourceDescriptions.bankingApi.listAccounts
+        parameters:
+          - reference: $components.parameters.authorization
+          - reference: $components.parameters.pageSize
+          - reference: $components.parameters.cursor
+          - name: customerId
+            in: query
+            value: $inputs.customerId
+        successCriteria:
+          - condition: $statusCode == 200
+        outputs:
+          accounts: $response.body#/items
+          nextCursor: $response.body#/nextCursor
+        onSuccess:
+          - name: fetchNextAccountPage
+            type: goto
+            stepId: getAccounts
+            criteria:
+              - condition: $response.body#/nextCursor != null
+          - name: accountsComplete
+            type: goto
+            stepId: logout
+            criteria:
+              - condition: $response.body#/nextCursor == null
+        x-readyapi-pagination:
+          accumulator: accounts
+          policy: x-readyapi-execution.pagination
+        x-readyapi-assertions:
+          - Every item customerId equals the input customerId exactly.
+          - Each page contains at most pageSize items; IDs are unique across all pages.
+      - &logout
+        stepId: logout
+        operationId: $sourceDescriptions.authApi.logoutUser
+        description: The adapter substitutes the latest refresh token after any rotation.
+        requestBody:
+          contentType: application/json
+          payload:
+            token: $steps.login.outputs.refreshToken
+        successCriteria:
+          - condition: $statusCode == 204
+    outputs:
+      lastAccountsPage: $steps.getAccounts.outputs.accounts
+    x-readyapi-outputs:
+      accounts: Publish the complete accounts accumulator as JSON, not only the final page.
+
+  - workflowId: createAccount
+    summary: Create an account and verify its persisted representation and balance
+    inputs:
+      allOf:
+        - $ref: '#/components/inputs/accountContext'
+        - type: object
+          required: [customerId, accountType, currency, initialDepositMinor]
+          properties:
+            customerId:
+              type: string
+              minLength: 1
+            accountType:
+              type: string
+              enum: [checking, savings]
+            currency:
+              type: string
+              enum: [EUR, USD, GBP]
+            initialDepositMinor:
+              type: integer
+              minimum: 0
+              maximum: 9007199254740991
+    x-readyapi-preconditions:
+      - accountId is unused, and customerId belongs to the authenticated user.
+    steps:
+      - *login
+      - stepId: createAccount
+        operationId: $sourceDescriptions.bankingApi.createAccount
+        parameters:
+          - reference: $components.parameters.authorization
+          - reference: $components.parameters.accountId
+        requestBody:
+          contentType: application/json
+          payload:
+            customerId: $inputs.customerId
+            type: $inputs.accountType
+            currency: $inputs.currency
+            initialDepositMinor: $inputs.initialDepositMinor
+        successCriteria:
+          - condition: $statusCode == 201
+          - condition: $response.body#/id == $inputs.accountId
+          - condition: $response.body#/customerId == $inputs.customerId
+          - condition: $response.body#/type == $inputs.accountType
+          - condition: $response.body#/currency == $inputs.currency
+          - condition: $response.body#/status == 'active'
+          - condition: $response.body#/balanceMinor == $inputs.initialDepositMinor
+        outputs:
+          accountId: $response.body#/id
+        x-readyapi-assertions:
+          - Account and customer IDs match the inputs case-sensitively.
+      - stepId: readAccount
+        operationId: $sourceDescriptions.bankingApi.getAccount
+        parameters:
+          - reference: $components.parameters.authorization
+          - name: accountId
+            in: path
+            value: $steps.createAccount.outputs.accountId
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/id == $steps.createAccount.outputs.accountId
+          - condition: $response.body#/customerId == $inputs.customerId
+          - condition: $response.body#/type == $inputs.accountType
+          - condition: $response.body#/currency == $inputs.currency
+          - condition: $response.body#/status == 'active'
+          - condition: $response.body#/balanceMinor == $inputs.initialDepositMinor
+        outputs:
+          account: $response.body
+        x-readyapi-assertions:
+          - Account and customer IDs match the inputs case-sensitively.
+      - *logout
+    outputs:
+      account: $steps.readAccount.outputs.account
+
+  - workflowId: updateAccount
+    summary: Change an account status and read it back
+    inputs:
+      allOf:
+        - $ref: '#/components/inputs/accountContext'
+        - type: object
+          required: [status]
+          properties:
+            status:
+              type: string
+              enum: [active, closed]
+    x-readyapi-preconditions:
+      - The account is owned by the authenticated user and is dedicated to this test.
+      - When closing, its posted balance is zero and it has no pending transfers.
+    steps:
+      - *login
+      - stepId: updateAccount
+        operationId: $sourceDescriptions.bankingApi.updateAccount
+        parameters:
+          - reference: $components.parameters.authorization
+          - reference: $components.parameters.accountId
+        requestBody:
+          contentType: application/json
+          payload:
+            status: $inputs.status
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/id == $inputs.accountId
+          - condition: $response.body#/status == $inputs.status
+      - stepId: readAccount
+        operationId: $sourceDescriptions.bankingApi.getAccount
+        parameters:
+          - reference: $components.parameters.authorization
+          - reference: $components.parameters.accountId
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/id == $inputs.accountId
+          - condition: $response.body#/status == $inputs.status
+        outputs:
+          account: $response.body
+        x-readyapi-assertions:
+          - Account ID matches the input accountId case-sensitively in both update and read responses.
+      - *logout
+    outputs:
+      account: $steps.readAccount.outputs.account
+
+  - workflowId: inspectAccount
+    summary: Rotate tokens, inspect paged transactions, and verify revocation
+    inputs:
+      allOf:
+        - $ref: '#/components/inputs/accountContext'
+        - type: object
+          properties:
+            fromDate:
+              type: string
+              format: date
+            toDate:
+              type: string
+              format: date
+            pageSize:
+              type: integer
+              minimum: 1
+              maximum: 100
+              default: 2
+    x-readyapi-preconditions:
+      - If both dates are supplied, fromDate is not later than toDate.
+    steps:
+      - *login
+      - stepId: refreshTokens
+        operationId: $sourceDescriptions.authApi.refreshSession
+        description: Explicit rotation exercises refresh even when no access token expires.
+        requestBody:
+          contentType: application/json
+          payload:
+            refresh_token: $steps.login.outputs.refreshToken
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/session_id == $steps.login.outputs.sessionId
+          - condition: $response.body#/token_type == 'Bearer'
+          - condition: $response.body#/expires_in > 0
+        outputs:
+          accessToken: $response.body#/access_token
+          refreshToken: $response.body#/refresh_token
+        x-readyapi-assertions:
+          - Session ID matches login exactly, and both tokens differ case-sensitively from login.
+      - stepId: rejectOldRefreshToken
+        operationId: $sourceDescriptions.authApi.refreshSession
+        requestBody:
+          contentType: application/json
+          payload:
+            refresh_token: $steps.login.outputs.refreshToken
+        successCriteria:
+          - condition: $statusCode == 401
+          - condition: $response.body#/code == 'INVALID_REFRESH_TOKEN'
+          - condition: $response.body#/status == 401
+      - stepId: getBalance
+        operationId: $sourceDescriptions.bankingApi.getBalance
+        parameters:
+          - name: Authorization
+            in: header
+            value: 'Bearer {$steps.refreshTokens.outputs.accessToken}'
+          - reference: $components.parameters.accountQuery
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/accountId == $inputs.accountId
+        outputs:
+          balance: $response.body
+      - stepId: getTransactions
+        operationId: $sourceDescriptions.bankingApi.listTransactions
+        parameters:
+          - name: Authorization
+            in: header
+            value: 'Bearer {$steps.refreshTokens.outputs.accessToken}'
+          - reference: $components.parameters.accountQuery
+          - reference: $components.parameters.pageSize
+          - reference: $components.parameters.cursor
+          - name: fromDate
+            in: query
+            value: $inputs.fromDate
+          - name: toDate
+            in: query
+            value: $inputs.toDate
+        successCriteria:
+          - condition: $statusCode == 200
+        outputs:
+          transactions: $response.body#/items
+          nextCursor: $response.body#/nextCursor
+        onSuccess:
+          - name: fetchNextTransactionPage
+            type: goto
+            stepId: getTransactions
+            criteria:
+              - condition: $response.body#/nextCursor != null
+          - name: transactionsComplete
+            type: goto
+            stepId: logout
+            criteria:
+              - condition: $response.body#/nextCursor == null
+        x-readyapi-pagination:
+          accumulator: transactions
+          policy: x-readyapi-execution.pagination
+        x-readyapi-assertions:
+          - Every item accountId equals the input accountId exactly.
+          - Every item currency equals the getBalance response currency.
+          - Every transaction date is within the inclusive supplied date boundaries.
+          - Each page contains at most pageSize items; transaction IDs are unique across all pages.
+      - stepId: logout
+        operationId: $sourceDescriptions.authApi.logoutUser
+        description: Substitute the latest state refresh token if recovery rotated again.
+        requestBody:
+          contentType: application/json
+          payload:
+            token: $steps.refreshTokens.outputs.refreshToken
+        successCriteria:
+          - condition: $statusCode == 204
+      - stepId: verifyRevokedAccess
+        operationId: $sourceDescriptions.bankingApi.getBalance
+        description: |
+          Use the latest access token immediately preceding logout, not the
+          original login token. The adapter must not refresh this negative probe.
+        parameters:
+          - name: Authorization
+            in: header
+            value: 'Bearer {$steps.refreshTokens.outputs.accessToken}'
+          - reference: $components.parameters.accountQuery
+        successCriteria:
+          - condition: $statusCode == 401
+          - condition: $response.body#/code == 'SESSION_REVOKED'
+          - condition: $response.body#/status == 401
+        x-readyapi-refresh: false
+      - stepId: verifyRevokedRefresh
+        operationId: $sourceDescriptions.authApi.refreshSession
+        description: Substitute the latest refresh token captured immediately before logout.
+        requestBody:
+          contentType: application/json
+          payload:
+            refresh_token: $steps.refreshTokens.outputs.refreshToken
+        successCriteria:
+          - condition: $statusCode == 401
+          - condition: $response.body#/code == 'SESSION_REVOKED'
+          - condition: $response.body#/status == 401
+        x-readyapi-refresh: false
+    outputs:
+      balance: $steps.getBalance.outputs.balance
+      lastTransactionsPage: $steps.getTransactions.outputs.transactions
+    x-readyapi-outputs:
+      transactions: Publish the complete transactions accumulator as JSON.
+
+  - workflowId: transferBetweenAccounts
+    summary: Complete a transfer and prove idempotent replay does not move money twice
+    inputs:
+      $ref: '#/components/inputs/transferInputs'
+    x-readyapi-preconditions:
+      - Source and destination are distinct, active, same-currency accounts owned by the user.
+      - Both accounts are isolated from other writers and have no pending reservations.
+      - The idempotencyKey has never been used by this customer.
+    steps:
+      - *login
+      - stepId: sourceBefore
+        operationId: $sourceDescriptions.bankingApi.getAccount
+        parameters:
+          - reference: $components.parameters.authorization
+          - name: accountId
+            in: path
+            value: $inputs.sourceAccountId
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/id == $inputs.sourceAccountId
+          - condition: $response.body#/status == 'active'
+          - condition: $response.body#/currency == $inputs.currency
+          - condition: $response.body#/balanceMinor >= $inputs.amountMinor
+        outputs:
+          balanceMinor: $response.body#/balanceMinor
+          customerId: $response.body#/customerId
+      - stepId: destinationBefore
+        operationId: $sourceDescriptions.bankingApi.getAccount
+        parameters:
+          - reference: $components.parameters.authorization
+          - name: accountId
+            in: path
+            value: $inputs.destinationAccountId
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/id == $inputs.destinationAccountId
+          - condition: $response.body#/status == 'active'
+          - condition: $response.body#/currency == $inputs.currency
+          - condition: $response.body#/customerId == $steps.sourceBefore.outputs.customerId
+        outputs:
+          balanceMinor: $response.body#/balanceMinor
+        x-readyapi-assertions:
+          - Input account IDs differ case-sensitively; ownership IDs match exactly.
+          - destinationBefore.balanceMinor plus amountMinor does not exceed 9007199254740991.
+      - stepId: submitTransfer
+        operationId: $sourceDescriptions.bankingApi.submitTransfer
+        parameters:
+          - reference: $components.parameters.authorization
+          - name: Idempotency-Key
+            in: header
+            value: $inputs.idempotencyKey
+        requestBody: &transferBody
+          contentType: application/json
+          payload:
+            sourceAccountId: $inputs.sourceAccountId
+            destinationAccountId: $inputs.destinationAccountId
+            amountMinor: $inputs.amountMinor
+            currency: $inputs.currency
+        successCriteria:
+          - condition: $statusCode == 202
+          - condition: $response.body#/status == 'pending'
+          - condition: $response.body#/sourceAccountId == $inputs.sourceAccountId
+          - condition: $response.body#/destinationAccountId == $inputs.destinationAccountId
+          - condition: $response.body#/amountMinor == $inputs.amountMinor
+          - condition: $response.body#/currency == $inputs.currency
+        outputs:
+          transferId: $response.body#/transferId
+      - stepId: pollTransfer
+        operationId: $sourceDescriptions.bankingApi.getTransfer
+        parameters:
+          - reference: $components.parameters.authorization
+          - name: transferId
+            in: path
+            value: $steps.submitTransfer.outputs.transferId
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/status == 'completed'
+          - condition: $response.body#/transferId == $steps.submitTransfer.outputs.transferId
+          - condition: $response.body#/sourceAccountId == $inputs.sourceAccountId
+          - condition: $response.body#/destinationAccountId == $inputs.destinationAccountId
+          - condition: $response.body#/amountMinor == $inputs.amountMinor
+          - condition: $response.body#/currency == $inputs.currency
+        onFailure:
+          - name: waitForCompletion
+            type: retry
+            retryAfter: 1
+            retryLimit: 5
+            criteria:
+              - condition: $statusCode == 200
+              - condition: $response.body#/status == 'pending'
+              - condition: $response.body#/transferId == $steps.submitTransfer.outputs.transferId
+              - condition: $response.body#/sourceAccountId == $inputs.sourceAccountId
+              - condition: $response.body#/destinationAccountId == $inputs.destinationAccountId
+              - condition: $response.body#/amountMinor == $inputs.amountMinor
+              - condition: $response.body#/currency == $inputs.currency
+        outputs:
+          transfer: $response.body
+        x-readyapi-assertions:
+          - On every response, transfer and account IDs match exactly, including while pending.
+          - A failed transfer or an identity mismatch fails immediately without further polling.
+      - stepId: sourceAfter
+        operationId: $sourceDescriptions.bankingApi.getBalance
+        parameters:
+          - reference: $components.parameters.authorization
+          - reference: $components.parameters.sourceQuery
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/accountId == $inputs.sourceAccountId
+          - condition: $response.body#/currency == $inputs.currency
+        outputs:
+          balanceMinor: $response.body#/balanceMinor
+        x-readyapi-assertions:
+          - balanceMinor equals sourceBefore.balanceMinor minus input amountMinor, using exact integer arithmetic.
+      - stepId: destinationAfter
+        operationId: $sourceDescriptions.bankingApi.getBalance
+        parameters:
+          - reference: $components.parameters.authorization
+          - reference: $components.parameters.destinationQuery
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/accountId == $inputs.destinationAccountId
+          - condition: $response.body#/currency == $inputs.currency
+        outputs:
+          balanceMinor: $response.body#/balanceMinor
+        x-readyapi-assertions:
+          - balanceMinor equals destinationBefore.balanceMinor plus input amountMinor, using exact integer arithmetic.
+          - The sum of the two balances is unchanged from the two before responses.
+      - stepId: replayTransfer
+        operationId: $sourceDescriptions.bankingApi.submitTransfer
+        parameters:
+          - reference: $components.parameters.authorization
+          - name: Idempotency-Key
+            in: header
+            value: $inputs.idempotencyKey
+        requestBody: *transferBody
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/transferId == $steps.submitTransfer.outputs.transferId
+          - condition: $response.body#/status == 'completed'
+          - condition: $response.body#/sourceAccountId == $inputs.sourceAccountId
+          - condition: $response.body#/destinationAccountId == $inputs.destinationAccountId
+          - condition: $response.body#/amountMinor == $inputs.amountMinor
+          - condition: $response.body#/currency == $inputs.currency
+      - stepId: sourceAfterReplay
+        operationId: $sourceDescriptions.bankingApi.getBalance
+        parameters:
+          - reference: $components.parameters.authorization
+          - reference: $components.parameters.sourceQuery
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/accountId == $inputs.sourceAccountId
+          - condition: $response.body#/currency == $inputs.currency
+          - condition: $response.body#/balanceMinor == $steps.sourceAfter.outputs.balanceMinor
+      - stepId: destinationAfterReplay
+        operationId: $sourceDescriptions.bankingApi.getBalance
+        parameters:
+          - reference: $components.parameters.authorization
+          - reference: $components.parameters.destinationQuery
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/accountId == $inputs.destinationAccountId
+          - condition: $response.body#/currency == $inputs.currency
+          - condition: $response.body#/balanceMinor == $steps.destinationAfter.outputs.balanceMinor
+      - *logout
+    outputs:
+      transfer: $steps.pollTransfer.outputs.transfer
+      sourceBalanceMinor: $steps.sourceAfter.outputs.balanceMinor
+      destinationBalanceMinor: $steps.destinationAfter.outputs.balanceMinor
+
+  - workflowId: rejectInsufficientFundsTransfer
+    summary: Reject an excessive transfer and prove neither balance changed
+    inputs:
+      $ref: '#/components/inputs/transferInputs'
+    x-readyapi-preconditions:
+      - Source and destination are distinct, active, same-currency accounts owned by the user.
+      - Both accounts are isolated from other writers and have no pending reservations.
+      - amountMinor must exceed the source posted balance; choose the value from a reset fixture.
+      - The idempotencyKey has never been used by this customer.
+    steps:
+      - *login
+      - stepId: sourceBefore
+        operationId: $sourceDescriptions.bankingApi.getAccount
+        parameters:
+          - reference: $components.parameters.authorization
+          - name: accountId
+            in: path
+            value: $inputs.sourceAccountId
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/id == $inputs.sourceAccountId
+          - condition: $response.body#/status == 'active'
+          - condition: $response.body#/currency == $inputs.currency
+          - condition: $response.body#/balanceMinor < $inputs.amountMinor
+        outputs:
+          balanceMinor: $response.body#/balanceMinor
+          customerId: $response.body#/customerId
+      - stepId: destinationBefore
+        operationId: $sourceDescriptions.bankingApi.getAccount
+        parameters:
+          - reference: $components.parameters.authorization
+          - name: accountId
+            in: path
+            value: $inputs.destinationAccountId
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/id == $inputs.destinationAccountId
+          - condition: $response.body#/status == 'active'
+          - condition: $response.body#/currency == $inputs.currency
+          - condition: $response.body#/customerId == $steps.sourceBefore.outputs.customerId
+        outputs:
+          balanceMinor: $response.body#/balanceMinor
+        x-readyapi-assertions:
+          - Input account IDs differ case-sensitively; ownership IDs match exactly.
+      - stepId: rejectTransfer
+        operationId: $sourceDescriptions.bankingApi.submitTransfer
+        parameters:
+          - reference: $components.parameters.authorization
+          - name: Idempotency-Key
+            in: header
+            value: $inputs.idempotencyKey
+        requestBody: *transferBody
+        successCriteria:
+          - condition: $statusCode == 422
+          - condition: $response.body#/code == 'INSUFFICIENT_FUNDS'
+          - condition: $response.body#/status == 422
+        outputs:
+          problem: $response.body
+      - stepId: sourceAfter
+        operationId: $sourceDescriptions.bankingApi.getBalance
+        parameters:
+          - reference: $components.parameters.authorization
+          - reference: $components.parameters.sourceQuery
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/accountId == $inputs.sourceAccountId
+          - condition: $response.body#/currency == $inputs.currency
+          - condition: $response.body#/balanceMinor == $steps.sourceBefore.outputs.balanceMinor
+      - stepId: destinationAfter
+        operationId: $sourceDescriptions.bankingApi.getBalance
+        parameters:
+          - reference: $components.parameters.authorization
+          - reference: $components.parameters.destinationQuery
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/accountId == $inputs.destinationAccountId
+          - condition: $response.body#/currency == $inputs.currency
+          - condition: $response.body#/balanceMinor == $steps.destinationBefore.outputs.balanceMinor
+      - *logout
+    outputs:
+      rejection: $steps.rejectTransfer.outputs.problem
