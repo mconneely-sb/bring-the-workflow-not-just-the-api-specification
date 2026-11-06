@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:testSuite xmlns:con="http://eviware.com/soapui/config" id="f3a98a84-54b2-48c9-8ae9-e5ba4e522b00" name="Banking Workflows v2">
+  <con:settings id="fd407792-835b-431e-b735-e4cee999423f">
+    <con:setting id="f3a98a84-54b2-48c9-8ae9-e5ba4e522b00fileName">Banking-Workflows-v2</con:setting>
+  </con:settings>
+  <con:runType>SEQUENTIAL</con:runType>
+  <con:properties/>
+  <con:reportParameters/>
+</con:testSuite>

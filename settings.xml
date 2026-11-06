@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project xmlns:con="http://eviware.com/soapui/config" id="6639e8dd-31e1-4661-a745-7e9e9a757bb3" created="4.3.0" activeEnvironment="Local" encryptionMode="Not encrypted" name="Arazzo-API-WF" projectVersion="" updated="4.3.0" compositeProjectFormat="1.3">
+  <con:settings>
+    <con:setting id="6639e8dd-31e1-4661-a745-7e9e9a757bb3fileName">Arazzo-API-WF</con:setting>
+  </con:settings>
+  <con:requirements/>
+  <con:properties>
+    <con:property>
+      <con:name>username</con:name>
+    </con:property>
+    <con:property>
+      <con:name>password</con:name>
+    </con:property>
+    <con:property>
+      <con:name>customerId</con:name>
+    </con:property>
+    <con:property>
+      <con:name>accountId</con:name>
+    </con:property>
+    <con:property>
+      <con:name>accountType</con:name>
+    </con:property>
+    <con:property>
+      <con:name>currency</con:name>
+    </con:property>
+    <con:property>
+      <con:name>initialDepositMinor</con:name>
+    </con:property>
+    <con:property>
+      <con:name>status</con:name>
+    </con:property>
+    <con:property>
+      <con:name>sourceAccountId</con:name>
+    </con:property>
+    <con:property>
+      <con:name>destinationAccountId</con:name>
+    </con:property>
+    <con:property>
+      <con:name>amountMinor</con:name>
+    </con:property>
+    <con:property>
+      <con:name>idempotencyKey</con:name>
+    </con:property>
+    <con:property>
+      <con:name>pageSize</con:name>
+    </con:property>
+  </con:properties>
+  <con:wssContainer/>
+  <con:databaseConnectionContainer/>
+  <con:jmsConnectionContainer/>
+  <con:oAuth2ProfileContainer/>
+  <con:oAuth1ProfileContainer/>
+  <con:eventHandlers type="RequestFilter.filterRequest" name="RequestFilter.filterRequest">
+    <con:script>// Sample event script to add custom HTTP header to all outgoing REST, SOAP and HTTP(S) calls
+// This code is often used for adding custom authentication to ReadyAPI functional tests
+
+// If hardcoding the token, uncomment and change line 5
+// token = '4567'
+
+// If your token is parameterized in Project level custom property, uncomment line 8
+// token = request.parent.testCase.testSuite.project.getProperty('auth_token').getValue()
+
+// To modify all outgoing calls, remove comments from lines 11 to 16
+// headers = request.requestHeaders
+// if (headers.containsKey('auth_token2') == false) {
+//   headers.put('auth_token2', token)
+//   request.requestHeaders = headers
+// }</con:script>
+  </con:eventHandlers>
+  <con:eventHandlers type="TestRunListener.afterStep" name="TestRunListener.afterStep">
+    <con:script>// Save all test step results into files
+// Change the directory path in line 5 to a location where you want to store details
+// then uncomment lines 5 to 10
+
+// filePath = 'C:\\tempOutputDirectory\\'
+// fos = new java.io.FileOutputStream(filePath + testStepResult.testStep.label + '.txt', true)
+// pw = new java.io.PrintWriter(fos)
+// testStepResult.writeTo(pw)
+// pw.close()
+// fos.close()</con:script>
+  </con:eventHandlers>
+  <con:environment id="68d4a8b0-5218-4ea4-b3cc-99a246e1da53" name="Local" index="0">
+    <con:service type="REST" name="Bearer Authentication API">
+      <con:endpoint authProfile="No Authorization">http://localhost:8081</con:endpoint>
+    </con:service>
+    <con:service type="REST" name="Banking Management API">
+      <con:endpoint authProfile="No Authorization">http://localhost:8082</con:endpoint>
+    </con:service>
+    <con:property>
+      <con:name>username</con:name>
+      <con:value/>
+    </con:property>
+    <con:property>
+      <con:name>password</con:name>
+      <con:value/>
+    </con:property>
+    <con:property>
+      <con:name>customerId</con:name>
+      <con:value>customer-demo</con:value>
+    </con:property>
+    <con:property>
+      <con:name>accountId</con:name>
+      <con:value>acc-new-001</con:value>
+    </con:property>
+    <con:property>
+      <con:name>accountType</con:name>
+      <con:value>checking</con:value>
+    </con:property>
+    <con:property>
+      <con:name>currency</con:name>
+      <con:value>EUR</con:value>
+    </con:property>
+    <con:property>
+      <con:name>initialDepositMinor</con:name>
+      <con:value>10000</con:value>
+    </con:property>
+    <con:property>
+      <con:name>status</con:name>
+      <con:value>active</con:value>
+    </con:property>
+    <con:property>
+      <con:name>sourceAccountId</con:name>
+      <con:value>acc-source</con:value>
+    </con:property>
+    <con:property>
+      <con:name>destinationAccountId</con:name>
+      <con:value>acc-destination</con:value>
+    </con:property>
+    <con:property>
+      <con:name>amountMinor</con:name>
+      <con:value>12500</con:value>
+    </con:property>
+    <con:property>
+      <con:name>idempotencyKey</con:name>
+      <con:value>idem-001</con:value>
+    </con:property>
+    <con:property>
+      <con:name>pageSize</con:name>
+      <con:value>2</con:value>
+    </con:property>
+    <con:databaseConnectionContainer/>
+    <con:jmsConnectionContainer/>
+  </con:environment>
+  <con:authRepository/>
+  <con:environmentSpec>
+    <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+      <con:authProfile>No Authorization</con:authProfile>
+    </con:entry>
+  </con:environmentSpec>
+  <con:tags>
+    <con:tag>
+      <con:id>ca6ab3c6-34e3-4fa9-8482-404db4bb3d97</con:id>
+      <con:name>auto-generated</con:name>
+    </con:tag>
+  </con:tags>
+</con:soapui-project>

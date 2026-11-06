@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:testCase xmlns:con="http://eviware.com/soapui/config" id="83d0104e-3007-4d5d-8c58-a2679bfb8ffc" discardOkResults="false" failOnError="false" failTestCaseOnErrors="true" keepSession="false" name="/accounts/{accountId} Test Case" searchProperties="true" timeout="0">
+  <con:description>The test case generated for the REST resource [/accounts/{accountId}] located at [/accounts/{accountId}]</con:description>
+  <con:settings>
+    <con:setting id="83d0104e-3007-4d5d-8c58-a2679bfb8ffcfileName">%2Faccounts%2F%7BaccountId%7D-Test-Case</con:setting>
+  </con:settings>
+  <con:testStep type="restrequest" name="Request 1" id="82151bd0-d990-4bf3-98e7-1585598d8397">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Banking Management API" resourcePath="/accounts/{accountId}" methodName="getAccount" xsi:type="con:RestRequestStep">
+      <con:restRequest name="Request 1" id="67e58fa1-ccdc-47bb-ba8e-e0e265686433" mediaType="application/json">
+        <con:settings/>
+        <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+        <con:request/>
+        <con:originalUri>http://localhost/accounts/</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="999a1550-3b43-49fd-8cef-cdc3dea1aa1c" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>200</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:assertion type="SwaggerComplianceAssertion" id="6c1507a8-5d69-4d20-b8d8-cc45c1c5760a" name="Swagger Compliance Assertion">
+          <con:configuration/>
+        </con:assertion>
+        <con:assertion type="Response SLA Assertion" id="f7aed60e-bf9c-48f2-940c-d3b6703da457" name="Response SLA">
+          <con:configuration/>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:parameters/>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="restrequest" name="Request 1 2" id="57ca311a-d1c4-4884-9e29-e83c1761d417">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Banking Management API" resourcePath="/accounts/{accountId}" methodName="createAccount" xsi:type="con:RestRequestStep">
+      <con:restRequest name="Request 1 2" id="d030a44e-d95a-4a3d-8976-11a3486aee9b" mediaType="application/json">
+        <con:settings/>
+        <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+        <con:request>{\r
+  "customerId" : "customer-demo",\r
+  "type" : "savings",\r
+  "currency" : "EUR",\r
+  "initialDepositMinor" : 10000\r
+}</con:request>
+        <con:originalUri>http://localhost/accounts/</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="5c6d5972-8119-40c2-864a-c1766f014ce3" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>201</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:assertion type="SwaggerComplianceAssertion" id="a838173b-a68b-46b5-bdc6-03ff8ebc87b2" name="Swagger Compliance Assertion">
+          <con:configuration/>
+        </con:assertion>
+        <con:assertion type="Response SLA Assertion" id="80c3c723-fcba-4a69-81f4-0e0706235e23" name="Response SLA">
+          <con:configuration/>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:parameters/>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="restrequest" name="Request 1 3" id="826d00b6-ff3f-4e14-b40e-810fdaf023ac">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Banking Management API" resourcePath="/accounts/{accountId}" methodName="updateAccount" xsi:type="con:RestRequestStep">
+      <con:restRequest name="Request 1 3" id="770cca0d-40c0-46f2-8f71-6f5feb3a5f48" mediaType="application/json">
+        <con:settings/>
+        <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+        <con:request>{\r
+  "status" : "active"\r
+}</con:request>
+        <con:originalUri>http://localhost/accounts/</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="eeaacf5b-fb87-4ac5-81f5-795b04d1bae3" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>200</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:assertion type="SwaggerComplianceAssertion" id="afa72fdd-466a-4387-ad4c-35152c1d487a" name="Swagger Compliance Assertion">
+          <con:configuration/>
+        </con:assertion>
+        <con:assertion type="Response SLA Assertion" id="c29bd532-cb0e-4da4-9341-228a89522623" name="Response SLA">
+          <con:configuration/>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:parameters/>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:properties/>
+  <con:reportParameters/>
+  <con:environmentSpec>
+    <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+      <con:authProfile>Inherit From Parent</con:authProfile>
+    </con:entry>
+  </con:environmentSpec>
+  <con:tagId>ca6ab3c6-34e3-4fa9-8482-404db4bb3d97</con:tagId>
+</con:testCase>

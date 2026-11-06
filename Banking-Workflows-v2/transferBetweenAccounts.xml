@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:testCase xmlns:con="http://eviware.com/soapui/config" id="0d9f5f94-0e44-4034-8eb1-d23057ea9a51" discardOkResults="false" failOnError="false" failTestCaseOnErrors="true" keepSession="false" name="transferBetweenAccounts" searchProperties="true" timeout="0">
+  <con:settings>
+    <con:setting id="0d9f5f94-0e44-4034-8eb1-d23057ea9a51fileName">transferBetweenAccounts</con:setting>
+  </con:settings>
+  <con:testStep type="restrequest" name="login" id="e5515243-ae8d-48ed-96f4-35db87ff4786">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Bearer Authentication API" resourcePath="/login" methodName="loginUser" xsi:type="con:RestRequestStep">
+      <con:restRequest name="login" id="605ee612-bd9e-42dc-a8d1-a271f933b22c" mediaType="application/json" postQueryString="false">
+        <con:settings/>
+        <con:endpoint>http://localhost:8081</con:endpoint>
+        <con:request>{"username":"${#Env#username}","password":"${#Env#password}"}</con:request>
+        <con:originalUri>http://localhost/login</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="e8e0b9ba-4c79-469f-a56f-445e8a0c4eb9" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>200</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>Inherit From Parent</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+        <con:parameters/>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="restrequest" name="sourceBefore" id="ee0afe3d-8a7f-4e5c-b6ee-4c69056b5e45">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Banking Management API" resourcePath="/accounts/{accountId}" methodName="getAccount" xsi:type="con:RestRequestStep">
+      <con:restRequest name="sourceBefore" id="67e58fa1-ccdc-47bb-ba8e-e0e265686433" mediaType="application/json">
+        <con:settings>
+          <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;con:entry key="Authorization" value="Bearer ${login#Response#$.access_token}" xmlns:con="http://eviware.com/soapui/config"/></con:setting>
+        </con:settings>
+        <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+        <con:request/>
+        <con:originalUri>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0/accounts/</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="31fcbc3f-6856-4a07-96fe-cf91f956b6a5" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>200</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>Inherit From Parent</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+        <con:parameters>
+          <con:entry key="accountId" value="${#Env#sourceAccountId}"/>
+        </con:parameters>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="restrequest" name="destinationBefore" id="5cd8a85c-b9df-41f6-b826-4a599e4ff8c5">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Banking Management API" resourcePath="/accounts/{accountId}" methodName="getAccount" xsi:type="con:RestRequestStep">
+      <con:restRequest name="destinationBefore" id="67e58fa1-ccdc-47bb-ba8e-e0e265686433" mediaType="application/json">
+        <con:settings>
+          <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;con:entry key="Authorization" value="Bearer ${login#Response#$.access_token}" xmlns:con="http://eviware.com/soapui/config"/></con:setting>
+        </con:settings>
+        <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+        <con:request/>
+        <con:originalUri>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0/accounts/</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="ffc5aaee-bf4a-4d5c-bac1-e7d2919ff6cc" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>200</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>Inherit From Parent</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+        <con:parameters>
+          <con:entry key="accountId" value="${#Env#destinationAccountId}"/>
+        </con:parameters>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="restrequest" name="submitTransfer" id="7bfda320-3b07-4aba-97f7-f246da2e92ad">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Banking Management API" resourcePath="/transfers" methodName="submitTransfer" xsi:type="con:RestRequestStep">
+      <con:restRequest name="submitTransfer" id="d0bb3d25-9760-40c0-8239-e8594385c8f8" mediaType="application/json" postQueryString="false">
+        <con:settings>
+          <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment>&lt;con:entry key="Authorization" value="Bearer ${login#Response#$.access_token}" xmlns:con="http://eviware.com/soapui/config"/>&lt;con:entry key="Idempotency-Key" value="${#Env#idempotencyKey}" xmlns:con="http://eviware.com/soapui/config"/>&lt;/xml-fragment></con:setting>
+        </con:settings>
+        <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+        <con:request>{"sourceAccountId":"${#Env#sourceAccountId}","destinationAccountId":"${#Env#destinationAccountId}","amountMinor":${#Env#amountMinor},"currency":"${#Env#currency}"}</con:request>
+        <con:originalUri>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0/transfers</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="5ce91d7e-e330-4f2e-99a3-11c6c4e815bd" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>202</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>Inherit From Parent</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+        <con:parameters/>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="restrequest" name="pollTransfer" id="ac27a21f-37d8-4a1d-ab9c-1fa46dce95e8">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Banking Management API" resourcePath="/transfers/{transferId}" methodName="getTransfer" xsi:type="con:RestRequestStep">
+      <con:restRequest name="pollTransfer" id="b825d10a-0582-46b0-93f8-89a9861b89e4" mediaType="application/json">
+        <con:settings>
+          <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;con:entry key="Authorization" value="Bearer ${login#Response#$.access_token}" xmlns:con="http://eviware.com/soapui/config"/></con:setting>
+        </con:settings>
+        <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+        <con:request/>
+        <con:originalUri>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0/transfers/</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="ac1c30d3-8fd4-46a7-8e40-f8c19d7a04fb" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>200</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>Inherit From Parent</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:parameters>
+          <con:entry key="transferId" value="${submitTransfer#Response#$.transferId}"/>
+        </con:parameters>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="restrequest" name="sourceAfter" id="cc16d3de-fcc2-4bf3-8a29-f10632329ab8">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Banking Management API" resourcePath="/balance" methodName="getBalance" xsi:type="con:RestRequestStep">
+      <con:restRequest name="sourceAfter" id="ab66d69d-876c-406b-88b1-ebc4a6c05c8a" mediaType="application/json">
+        <con:settings>
+          <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;con:entry key="Authorization" value="Bearer ${login#Response#$.access_token}" xmlns:con="http://eviware.com/soapui/config"/></con:setting>
+        </con:settings>
+        <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+        <con:request/>
+        <con:originalUri>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0/balance</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="6ec353e5-8fe6-4975-9e9c-279ddbaa94a3" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>200</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>Inherit From Parent</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:parameters>
+          <con:entry key="accountId" value="${#Env#sourceAccountId}"/>
+        </con:parameters>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="restrequest" name="destinationAfter" id="c030a63c-e625-4e0f-8eca-4ff067d9e754">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Banking Management API" resourcePath="/balance" methodName="getBalance" xsi:type="con:RestRequestStep">
+      <con:restRequest name="destinationAfter" id="ab66d69d-876c-406b-88b1-ebc4a6c05c8a" mediaType="application/json">
+        <con:settings>
+          <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;con:entry key="Authorization" value="Bearer ${login#Response#$.access_token}" xmlns:con="http://eviware.com/soapui/config"/></con:setting>
+        </con:settings>
+        <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+        <con:request/>
+        <con:originalUri>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0/balance</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="98e05cc9-f700-4470-8e21-1feffd3472e3" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>200</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>Inherit From Parent</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:parameters>
+          <con:entry key="accountId" value="${#Env#destinationAccountId}"/>
+        </con:parameters>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="restrequest" name="replayTransfer" id="90f3fd8b-8b4c-429c-a375-25c2e391cd7c">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Banking Management API" resourcePath="/transfers" methodName="submitTransfer" xsi:type="con:RestRequestStep">
+      <con:restRequest name="replayTransfer" id="d0bb3d25-9760-40c0-8239-e8594385c8f8" mediaType="application/json">
+        <con:settings>
+          <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment>&lt;con:entry key="Authorization" value="Bearer ${login#Response#$.access_token}" xmlns:con="http://eviware.com/soapui/config"/>&lt;con:entry key="Idempotency-Key" value="${#Env#idempotencyKey}" xmlns:con="http://eviware.com/soapui/config"/>&lt;/xml-fragment></con:setting>
+        </con:settings>
+        <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+        <con:request>{"sourceAccountId":"${#Env#sourceAccountId}","destinationAccountId":"${#Env#destinationAccountId}","amountMinor":${#Env#amountMinor},"currency":"${#Env#currency}"}</con:request>
+        <con:originalUri>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0/transfers</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="53b19f17-57e0-42b8-98e8-07c1399e7d8c" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>200</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>Inherit From Parent</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:parameters/>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="restrequest" name="sourceAfterReplay" id="1cdb47f2-405a-4b06-ab2a-7ead0b776ee9">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Banking Management API" resourcePath="/balance" methodName="getBalance" xsi:type="con:RestRequestStep">
+      <con:restRequest name="sourceAfterReplay" id="ab66d69d-876c-406b-88b1-ebc4a6c05c8a" mediaType="application/json">
+        <con:settings>
+          <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;con:entry key="Authorization" value="Bearer ${login#Response#$.access_token}" xmlns:con="http://eviware.com/soapui/config"/></con:setting>
+        </con:settings>
+        <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+        <con:request/>
+        <con:originalUri>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0/balance</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="adb3e50a-9034-4194-968c-8f91813e5030" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>200</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>Inherit From Parent</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:parameters>
+          <con:entry key="accountId" value="${#Env#sourceAccountId}"/>
+        </con:parameters>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="restrequest" name="destinationAfterReplay" id="8aa2f7e8-11e7-4274-9c08-54cd52904205">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Banking Management API" resourcePath="/balance" methodName="getBalance" xsi:type="con:RestRequestStep">
+      <con:restRequest name="destinationAfterReplay" id="ab66d69d-876c-406b-88b1-ebc4a6c05c8a" mediaType="application/json">
+        <con:settings>
+          <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;con:entry key="Authorization" value="Bearer ${login#Response#$.access_token}" xmlns:con="http://eviware.com/soapui/config"/></con:setting>
+        </con:settings>
+        <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+        <con:request/>
+        <con:originalUri>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0/balance</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="c43ee7c6-9ce4-42e0-b91f-cfe91ccfc84d" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>200</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>Inherit From Parent</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:parameters>
+          <con:entry key="accountId" value="${#Env#destinationAccountId}"/>
+        </con:parameters>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="restrequest" name="logout" id="014f7f57-73cf-464b-9dca-a78d03f02cf7">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Bearer Authentication API" resourcePath="/logout" methodName="logoutUser" xsi:type="con:RestRequestStep">
+      <con:restRequest name="logout" id="90b9f06c-e616-409c-834c-3c7f34e80bb9" mediaType="application/json">
+        <con:settings/>
+        <con:endpoint>http://localhost:8081</con:endpoint>
+        <con:request>{"token":"${login#Response#$.refresh_token}"}</con:request>
+        <con:originalUri>http://localhost/logout</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="a6c89324-9bbd-4cfe-9499-8d3370bdac3c" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>204</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>Inherit From Parent</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:parameters/>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:properties/>
+  <con:reportParameters/>
+</con:testCase>

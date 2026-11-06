@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:restMockAction xmlns:con="http://eviware.com/soapui/config" name="/login" method="POST" resourcePath="/login" id="f2505454-6fee-4241-aa3a-f4c882a5f6b5">
+  <con:settings>
+    <con:setting id="f2505454-6fee-4241-aa3a-f4c882a5f6b5fileName">%2Flogin</con:setting>
+  </con:settings>
+  <con:dispatchStyle>SEQUENCE</con:dispatchStyle>
+  <con:dispatchConfig/>
+  <con:dispatchXPath/>
+  <con:requestRouteScript/>
+  <con:delayConfiguration/>
+  <con:response name="Response 1" id="4d69f330-6175-4235-95da-7c0abe11480f" httpResponseStatus="200" mediaType="application/json" compressedBodyContent="aced00057372002f636f6d2e657669776172652e736f617075692e696d706c2e737570706f72742e436f6d7072657373656456616c7565000b8b02c748eeab0200035a000a636f6d707265737365644c000b636f6d7072657373696f6e74003d4c636f6d2f657669776172652f736f617075692f696d706c2f737570706f72742f436f6d7072657373656456616c756524436f6d7072657373696f6e3b5b0004646174617400025b427870007e72003b636f6d2e657669776172652e736f617075692e696d706c2e737570706f72742e436f6d7072657373656456616c756524436f6d7072657373696f6e00000000000000001200007872000e6a6176612e6c616e672e456e756d000000000000000012000078707400044e4f4e4570" dataSource="">
+    <con:settings/>
+    <con:responseContent>{
+  "access_token" : "synthetic-access-token-1",
+  "refresh_token" : "synthetic-refresh-token-1",
+  "token_type" : "Bearer",
+  "expires_in" : 300,
+  "session_id" : "session-demo-1"
+}</con:responseContent>
+  </con:response>
+  <con:response name="Response 2" id="598d6a46-2faf-4459-817c-bbeccb4fd427" httpResponseStatus="400" mediaType="application/problem+json" compressedBodyContent="aced00057372002f636f6d2e657669776172652e736f617075692e696d706c2e737570706f72742e436f6d7072657373656456616c7565000b8b02c748eeab0200035a000a636f6d707265737365644c000b636f6d7072657373696f6e74003d4c636f6d2f657669776172652f736f617075692f696d706c2f737570706f72742f436f6d7072657373656456616c756524436f6d7072657373696f6e3b5b0004646174617400025b427870007e72003b636f6d2e657669776172652e736f617075692e696d706c2e737570706f72742e436f6d7072657373656456616c756524436f6d7072657373696f6e00000000000000001200007872000e6a6176612e6c616e672e456e756d000000000000000012000078707400044e4f4e4570" dataSource="">
+    <con:settings/>
+    <con:responseContent>{
+  "type" : "urn:banking:error:invalid-request",
+  "title" : "Invalid request",
+  "status" : 400,
+  "code" : "INVALID_REQUEST",
+  "detail" : "A required field is missing or invalid."
+}</con:responseContent>
+  </con:response>
+  <con:response name="Response 3" id="7323b32c-0988-4dc1-ae40-024a81916d84" httpResponseStatus="401" mediaType="application/problem+json" compressedBodyContent="aced00057372002f636f6d2e657669776172652e736f617075692e696d706c2e737570706f72742e436f6d7072657373656456616c7565000b8b02c748eeab0200035a000a636f6d707265737365644c000b636f6d7072657373696f6e74003d4c636f6d2f657669776172652f736f617075692f696d706c2f737570706f72742f436f6d7072657373656456616c756524436f6d7072657373696f6e3b5b0004646174617400025b427870007e72003b636f6d2e657669776172652e736f617075692e696d706c2e737570706f72742e436f6d7072657373656456616c756524436f6d7072657373696f6e00000000000000001200007872000e6a6176612e6c616e672e456e756d000000000000000012000078707400044e4f4e4570" dataSource="">
+    <con:settings/>
+    <con:responseContent>{
+  "type" : "urn:banking:error:invalid-credentials",
+  "title" : "Invalid credentials",
+  "status" : 401,
+  "code" : "INVALID_CREDENTIALS",
+  "detail" : "The username or password is incorrect."
+}</con:responseContent>
+  </con:response>
+</con:restMockAction>

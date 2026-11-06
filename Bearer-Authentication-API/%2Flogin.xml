@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:con="http://eviware.com/soapui/config" name="/login" path="/login" id="0a3278b6-51ce-4926-af75-c086648d9bd8">
+  <con:settings>
+    <con:setting id="0a3278b6-51ce-4926-af75-c086648d9bd8fileName">%2Flogin</con:setting>
+  </con:settings>
+  <con:parameters/>
+  <con:method name="loginUser" id="143ca40b-64da-441f-98ac-f1b34f937d9b" method="POST">
+    <con:description>Create a session and issue access and refresh tokens</con:description>
+    <con:settings/>
+    <con:parameters/>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/json</con:mediaType>
+      <con:status>200</con:status>
+      <con:params/>
+      <con:description>Session created</con:description>
+      <con:sampleContent>{
+  "access_token" : "synthetic-access-token-1",
+  "refresh_token" : "synthetic-refresh-token-1",
+  "token_type" : "Bearer",
+  "expires_in" : 300,
+  "session_id" : "session-demo-1"
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>400</con:status>
+      <con:params/>
+      <con:description>Missing or invalid request fields</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:invalid-request",
+  "title" : "Invalid request",
+  "status" : 400,
+  "code" : "INVALID_REQUEST",
+  "detail" : "A required field is missing or invalid."
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>401</con:status>
+      <con:params/>
+      <con:description>Invalid credentials</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:invalid-credentials",
+  "title" : "Invalid credentials",
+  "status" : 401,
+  "code" : "INVALID_CREDENTIALS",
+  "detail" : "The username or password is incorrect."
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="REQUEST">
+      <con:mediaType>application/json</con:mediaType>
+      <con:params/>
+      <con:sampleContent>{
+  "username" : "demo-user",
+  "password" : "not-a-real-password"
+}</con:sampleContent>
+    </con:representation>
+    <con:request name="Request 1" id="605ee612-bd9e-42dc-a8d1-a271f933b22c" mediaType="application/json" postQueryString="false">
+      <con:settings/>
+      <con:endpoint>http://localhost:8081</con:endpoint>
+      <con:request>{\r
+  "username" : "demo-user",\r
+  "password" : "not-a-real-password"\r
+}</con:request>
+      <con:credentials>
+        <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+        <con:authType>No Authorization</con:authType>
+      </con:credentials>
+      <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+      <con:parameters/>
+      <con:environmentSpec>
+        <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+          <con:authProfile>Inherit From Parent</con:authProfile>
+        </con:entry>
+      </con:environmentSpec>
+    </con:request>
+    <con:environmentSpec>
+      <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+        <con:authProfile>Inherit From Parent</con:authProfile>
+      </con:entry>
+    </con:environmentSpec>
+  </con:method>
+  <con:environmentSpec>
+    <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+      <con:authProfile>Inherit From Parent</con:authProfile>
+    </con:entry>
+  </con:environmentSpec>
+</con:resource>

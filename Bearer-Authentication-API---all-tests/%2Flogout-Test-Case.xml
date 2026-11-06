@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:testCase xmlns:con="http://eviware.com/soapui/config" id="d860a36c-788c-44bd-bce8-20f83b0042db" discardOkResults="false" failOnError="false" failTestCaseOnErrors="true" keepSession="false" name="/logout Test Case" searchProperties="true" timeout="0">
+  <con:description>The test case generated for the REST resource [/logout] located at [/logout]</con:description>
+  <con:settings>
+    <con:setting id="d860a36c-788c-44bd-bce8-20f83b0042dbfileName">%2Flogout-Test-Case</con:setting>
+  </con:settings>
+  <con:testStep type="restrequest" name="Request 1" id="b41a97ae-5534-40d3-9c9e-f170b19159ea">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Bearer Authentication API" resourcePath="/logout" methodName="logoutUser" xsi:type="con:RestRequestStep">
+      <con:restRequest name="Request 1" id="90b9f06c-e616-409c-834c-3c7f34e80bb9" mediaType="application/json">
+        <con:settings/>
+        <con:endpoint>http://localhost:8081</con:endpoint>
+        <con:request>{\r
+  "token" : "string"\r
+}</con:request>
+        <con:originalUri>http://localhost/logout</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="b2abbfa6-6c4b-48fd-ba40-507f89d99ffa" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>204,400,401</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:assertion type="SwaggerComplianceAssertion" id="88879a3c-f06a-4c95-99f9-8699a7cf6b89" name="Swagger Compliance Assertion">
+          <con:configuration/>
+        </con:assertion>
+        <con:assertion type="Response SLA Assertion" id="edf28b56-9385-4ee2-89cc-788d21b690aa" name="Response SLA">
+          <con:configuration/>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:parameters/>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:properties/>
+  <con:reportParameters/>
+  <con:environmentSpec>
+    <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+      <con:authProfile>Inherit From Parent</con:authProfile>
+    </con:entry>
+  </con:environmentSpec>
+  <con:tagId>ca6ab3c6-34e3-4fa9-8482-404db4bb3d97</con:tagId>
+</con:testCase>

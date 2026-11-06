@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:con="http://eviware.com/soapui/config" name="/accounts/{accountId}" path="/accounts/{accountId}" id="b4c293dc-5610-451f-837a-e1a8c5296c11">
+  <con:settings>
+    <con:setting id="b4c293dc-5610-451f-837a-e1a8c5296c11fileName">%2Faccounts%2F%7BaccountId%7D</con:setting>
+  </con:settings>
+  <con:parameters>
+    <con:parameter required="true">
+      <con:name>accountId</con:name>
+      <con:style>TEMPLATE</con:style>
+    </con:parameter>
+  </con:parameters>
+  <con:method name="getAccount" id="cea6a797-df6a-4d9e-b95b-9661e2500a00" method="GET">
+    <con:description>Retrieve a single owned account</con:description>
+    <con:settings/>
+    <con:parameters/>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/json</con:mediaType>
+      <con:status>200</con:status>
+      <con:params/>
+      <con:description>Account representation</con:description>
+      <con:sampleContent>{
+  "id" : "acc-source",
+  "customerId" : "customer-demo",
+  "type" : "checking",
+  "currency" : "EUR",
+  "status" : "active",
+  "balanceMinor" : 50000
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>401</con:status>
+      <con:params/>
+      <con:description>Authentication failed before any side effect. A revoked session takes
+precedence over expiry. Only TOKEN_EXPIRED permits refresh recovery.
+</con:description>
+      <con:sampleContent>{
+  "type" : "string",
+  "title" : "string",
+  "status" : 0,
+  "code" : "INVALID_REQUEST",
+  "detail" : "string"
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>403</con:status>
+      <con:params/>
+      <con:description>Resource belongs to another customer</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:forbidden",
+  "title" : "Forbidden",
+  "status" : 403,
+  "code" : "FORBIDDEN",
+  "detail" : "The customer does not own this resource."
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>404</con:status>
+      <con:params/>
+      <con:description>Account or transfer does not exist</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:not-found",
+  "title" : "Not found",
+  "status" : 404,
+  "code" : "NOT_FOUND",
+  "detail" : "The requested resource does not exist."
+}</con:sampleContent>
+    </con:representation>
+    <con:request name="Request 1" id="67e58fa1-ccdc-47bb-ba8e-e0e265686433" mediaType="application/json">
+      <con:settings/>
+      <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+      <con:credentials>
+        <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+        <con:authType>No Authorization</con:authType>
+      </con:credentials>
+      <con:parameters/>
+      <con:environmentSpec>
+        <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+          <con:authProfile>Inherit From Parent</con:authProfile>
+        </con:entry>
+      </con:environmentSpec>
+    </con:request>
+    <con:environmentSpec>
+      <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+        <con:authProfile>Inherit From Parent</con:authProfile>
+      </con:entry>
+    </con:environmentSpec>
+  </con:method>
+  <con:method name="createAccount" id="c5efb824-a7f7-42eb-bd38-c664beb79e30" method="POST">
+    <con:description>The ID must be new. The supplied customer must be the authenticated
+customer. New accounts are active and immediately readable.
+initialDepositMinor becomes balanceMinor. Creation is not idempotent;
+an existing ID returns 409 without modifying the account.
+</con:description>
+    <con:settings/>
+    <con:parameters/>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/json</con:mediaType>
+      <con:status>201</con:status>
+      <con:params/>
+      <con:description>Account representation</con:description>
+      <con:sampleContent>{
+  "id" : "acc-source",
+  "customerId" : "customer-demo",
+  "type" : "checking",
+  "currency" : "EUR",
+  "status" : "active",
+  "balanceMinor" : 50000
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>400</con:status>
+      <con:params/>
+      <con:description>Invalid fields, cursor, date range, or identical transfer accounts</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:invalid-request",
+  "title" : "Invalid request",
+  "status" : 400,
+  "code" : "INVALID_REQUEST",
+  "detail" : "Request validation failed."
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>401</con:status>
+      <con:params/>
+      <con:description>Authentication failed before any side effect. A revoked session takes
+precedence over expiry. Only TOKEN_EXPIRED permits refresh recovery.
+</con:description>
+      <con:sampleContent>{
+  "type" : "string",
+  "title" : "string",
+  "status" : 0,
+  "code" : "INVALID_REQUEST",
+  "detail" : "string"
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>403</con:status>
+      <con:params/>
+      <con:description>Resource belongs to another customer</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:forbidden",
+  "title" : "Forbidden",
+  "status" : 403,
+  "code" : "FORBIDDEN",
+  "detail" : "The customer does not own this resource."
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>409</con:status>
+      <con:params/>
+      <con:description>Account ID already exists</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:account-exists",
+  "title" : "Account already exists",
+  "status" : 409,
+  "code" : "ACCOUNT_EXISTS",
+  "detail" : "Choose a new account ID."
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="REQUEST">
+      <con:mediaType>application/json</con:mediaType>
+      <con:params/>
+      <con:sampleContent>{
+  "customerId" : "customer-demo",
+  "type" : "savings",
+  "currency" : "EUR",
+  "initialDepositMinor" : 10000
+}</con:sampleContent>
+    </con:representation>
+    <con:request name="Request 1" id="d030a44e-d95a-4a3d-8976-11a3486aee9b" mediaType="application/json">
+      <con:settings/>
+      <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+      <con:request>{\r
+  "customerId" : "customer-demo",\r
+  "type" : "savings",\r
+  "currency" : "EUR",\r
+  "initialDepositMinor" : 10000\r
+}</con:request>
+      <con:credentials>
+        <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+        <con:authType>No Authorization</con:authType>
+      </con:credentials>
+      <con:parameters/>
+      <con:environmentSpec>
+        <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+          <con:authProfile>Inherit From Parent</con:authProfile>
+        </con:entry>
+      </con:environmentSpec>
+    </con:request>
+    <con:environmentSpec>
+      <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+        <con:authProfile>Inherit From Parent</con:authProfile>
+      </con:entry>
+    </con:environmentSpec>
+  </con:method>
+  <con:method name="updateAccount" id="46b55486-4f88-4e94-a176-a3772e1e308e" method="PUT">
+    <con:description>Supports active and closed. Closing is permitted only for a zero-balance
+account with no pending transfers. Reopening is permitted in this demo.
+The returned status is immediately visible to getAccount.
+</con:description>
+    <con:settings/>
+    <con:parameters/>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/json</con:mediaType>
+      <con:status>200</con:status>
+      <con:params/>
+      <con:description>Account representation</con:description>
+      <con:sampleContent>{
+  "id" : "acc-source",
+  "customerId" : "customer-demo",
+  "type" : "checking",
+  "currency" : "EUR",
+  "status" : "active",
+  "balanceMinor" : 50000
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>400</con:status>
+      <con:params/>
+      <con:description>Invalid fields, cursor, date range, or identical transfer accounts</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:invalid-request",
+  "title" : "Invalid request",
+  "status" : 400,
+  "code" : "INVALID_REQUEST",
+  "detail" : "Request validation failed."
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>401</con:status>
+      <con:params/>
+      <con:description>Authentication failed before any side effect. A revoked session takes
+precedence over expiry. Only TOKEN_EXPIRED permits refresh recovery.
+</con:description>
+      <con:sampleContent>{
+  "type" : "string",
+  "title" : "string",
+  "status" : 0,
+  "code" : "INVALID_REQUEST",
+  "detail" : "string"
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>403</con:status>
+      <con:params/>
+      <con:description>Resource belongs to another customer</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:forbidden",
+  "title" : "Forbidden",
+  "status" : 403,
+  "code" : "FORBIDDEN",
+  "detail" : "The customer does not own this resource."
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>404</con:status>
+      <con:params/>
+      <con:description>Account or transfer does not exist</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:not-found",
+  "title" : "Not found",
+  "status" : 404,
+  "code" : "NOT_FOUND",
+  "detail" : "The requested resource does not exist."
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>409</con:status>
+      <con:params/>
+      <con:description>Account has a nonzero balance or pending transfers</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:account-not-closable",
+  "title" : "Account cannot be closed",
+  "status" : 409,
+  "code" : "ACCOUNT_NOT_CLOSABLE",
+  "detail" : "The account must have a zero balance and no pending transfers."
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="REQUEST">
+      <con:mediaType>application/json</con:mediaType>
+      <con:params/>
+      <con:sampleContent>{
+  "status" : "active"
+}</con:sampleContent>
+    </con:representation>
+    <con:request name="Request 1" id="770cca0d-40c0-46f2-8f71-6f5feb3a5f48" mediaType="application/json">
+      <con:settings/>
+      <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+      <con:request>{\r
+  "status" : "active"\r
+}</con:request>
+      <con:credentials>
+        <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+        <con:authType>No Authorization</con:authType>
+      </con:credentials>
+      <con:parameters/>
+      <con:environmentSpec>
+        <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+          <con:authProfile>Inherit From Parent</con:authProfile>
+        </con:entry>
+      </con:environmentSpec>
+    </con:request>
+    <con:environmentSpec>
+      <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+        <con:authProfile>Inherit From Parent</con:authProfile>
+      </con:entry>
+    </con:environmentSpec>
+  </con:method>
+  <con:environmentSpec>
+    <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+      <con:authProfile>Inherit From Parent</con:authProfile>
+    </con:entry>
+  </con:environmentSpec>
+</con:resource>

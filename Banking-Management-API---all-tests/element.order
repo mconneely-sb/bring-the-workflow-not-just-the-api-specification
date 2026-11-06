@@ -1,0 +1,6 @@
+%2Faccounts-Test-Case.xml
+%2Faccounts%2F%7BaccountId%7D-Test-Case.xml
+%2Fbalance-Test-Case.xml
+%2Ftransactions-Test-Case.xml
+%2Ftransfers-Test-Case.xml
+%2Ftransfers%2F%7BtransferId%7D-Test-Case.xml

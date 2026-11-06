@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:testSuite xmlns:con="http://eviware.com/soapui/config" id="4c7c16a8-da4f-4dee-b9ab-84df3961d03a" name="Bearer Authentication API - all tests">
+  <con:settings id="9679ed11-4e05-49ca-b6d8-830e317e6937">
+    <con:setting id="4c7c16a8-da4f-4dee-b9ab-84df3961d03afileName">Bearer-Authentication-API---all-tests</con:setting>
+  </con:settings>
+  <con:runType>SEQUENTIAL</con:runType>
+  <con:properties/>
+  <con:reportParameters/>
+  <con:environmentSpec>
+    <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+      <con:authProfile>Inherit From Parent</con:authProfile>
+    </con:entry>
+  </con:environmentSpec>
+</con:testSuite>

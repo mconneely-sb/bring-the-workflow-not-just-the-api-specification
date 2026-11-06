@@ -1,0 +1,727 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:con="http://eviware.com/soapui/config" xsi:type="con:RestService" id="78744637-9f8a-4988-b28a-43b281999ab8" lastUpdated="2026-10-20T16:04:13.448+01:00" name="Banking Management API" type="rest_ex" wadlVersion="https://swagger.io/openapiv3/specification" definitionUrl="file:/C:/Work/claude-work/readyapi-arrazo/banking-management-api-2.0.0.yaml">
+  <con:description>Stateful banking contract for the v2 workflow example. All monetary values
+are integer minor units (12500 means EUR 125.00). Transfers are fee-free,
+same-currency, and between distinct active accounts owned by the authenticated
+customer. There is no overdraft facility.
+A pending transfer does not change posted balances. Completion atomically
+debits the source, credits the destination, and creates two ledger entries.
+Failed or rejected transfers have no balance or ledger effects.
+The authentication service and banking service share session revocation state.
+This file does not deploy a service. Supply an isolated implementation or
+stateful mock; static auto-mocking cannot verify these business semantics.
+</con:description>
+  <con:settings id="cc9e3e97-b70c-48c9-8e73-2f5ac72c0f7e">
+    <con:setting id="78744637-9f8a-4988-b28a-43b281999ab8fileName">Banking-Management-API</con:setting>
+  </con:settings>
+  <con:definitionCache type="TEXT" rootPart="file:/C:/Work/claude-work/readyapi-arrazo/banking-management-api-2.0.0.yaml">
+    <con:part>
+      <con:url>file:/C:/Work/claude-work/readyapi-arrazo/banking-management-api-2.0.0.yaml</con:url>
+      <con:content>openapi: 3.0.3
+info:
+  title: Banking Management API
+  version: 2.0.0
+  description: |
+    Stateful banking contract for the v2 workflow example. All monetary values
+    are integer minor units (12500 means EUR 125.00). Transfers are fee-free,
+    same-currency, and between distinct active accounts owned by the authenticated
+    customer. There is no overdraft facility.
+    A pending transfer does not change posted balances. Completion atomically
+    debits the source, credits the destination, and creates two ledger entries.
+    Failed or rejected transfers have no balance or ledger effects.
+    The authentication service and banking service share session revocation state.
+    This file does not deploy a service. Supply an isolated implementation or
+    stateful mock; static auto-mocking cannot verify these business semantics.
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0
+security:
+  - bearerHttpAuthentication: []
+paths:
+  /accounts:
+    get:
+      operationId: listAccounts
+      summary: List a customer's accounts using cursor pagination
+      description: |
+        Returns accounts sorted by ID in a stable snapshot. An omitted or empty
+        cursor starts a new snapshot. Subsequent cursors preserve that snapshot
+        and the original filters. nextCursor is null on the final page.
+        An empty result returns items [] and nextCursor null, not 404.
+        The authenticated customer must own customerId, otherwise return 403.
+      parameters:
+        - name: customerId
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, closed]
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: One page of accounts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountPage'
+              example:
+                items:
+                  - id: acc-source
+                    customerId: customer-demo
+                    type: checking
+                    currency: EUR
+                    status: active
+                    balanceMinor: 50000
+                nextCursor: account-page-2
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /accounts/{accountId}:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      operationId: getAccount
+      summary: Retrieve a single owned account
+      responses:
+        '200':
+          $ref: '#/components/responses/AccountResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      operationId: createAccount
+      summary: Create an account with an initial posted balance
+      description: |
+        The ID must be new. The supplied customer must be the authenticated
+        customer. New accounts are active and immediately readable.
+        initialDepositMinor becomes balanceMinor. Creation is not idempotent;
+        an existing ID returns 409 without modifying the account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountRequest'
+            example:
+              customerId: customer-demo
+              type: savings
+              currency: EUR
+              initialDepositMinor: 10000
+      responses:
+        '201':
+          $ref: '#/components/responses/AccountResult'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Account ID already exists
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                type: urn:banking:error:account-exists
+                title: Account already exists
+                status: 409
+                code: ACCOUNT_EXISTS
+                detail: Choose a new account ID.
+    put:
+      operationId: updateAccount
+      summary: Update an account's status
+      description: |
+        Supports active and closed. Closing is permitted only for a zero-balance
+        account with no pending transfers. Reopening is permitted in this demo.
+        The returned status is immediately visible to getAccount.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [active, closed]
+      responses:
+        '200':
+          $ref: '#/components/responses/AccountResult'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Account has a nonzero balance or pending transfers
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                type: urn:banking:error:account-not-closable
+                title: Account cannot be closed
+                status: 409
+                code: ACCOUNT_NOT_CLOSABLE
+                detail: The account must have a zero balance and no pending transfers.
+  /balance:
+    get:
+      operationId: getBalance
+      summary: Retrieve an owned account's posted balance
+      parameters:
+        - $ref: '#/components/parameters/AccountQuery'
+      responses:
+        '200':
+          description: Current posted balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance'
+              example:
+                accountId: acc-source
+                currency: EUR
+                balanceMinor: 50000
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /transactions:
+    get:
+      operationId: listTransactions
+      summary: List an owned account's transactions using a stable snapshot
+      description: |
+        Inclusive UTC calendar-date boundaries. fromDate must be &lt;= toDate when
+        both are supplied. Results are sorted by date then ID. The cursor freezes
+        the snapshot and filters; nextCursor null marks the final page.
+        Omit unset dates; do not send literal null or empty date strings.
+        An account without matching transactions returns an empty final page.
+      parameters:
+        - $ref: '#/components/parameters/AccountQuery'
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: One page of transactions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionPage'
+              example:
+                items:
+                  - id: txn-demo-1
+                    accountId: acc-source
+                    transferId: transfer-demo-1
+                    date: '2026-10-01'
+                    amountMinor: -12500
+                    currency: EUR
+                    description: Transfer debit
+                nextCursor: null
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /transfers:
+    post:
+      operationId: submitTransfer
+      summary: Accept a fee-free asynchronous transfer
+      description: |
+        Validate authentication before any side effect. A 401 TOKEN_EXPIRED
+        guarantees no transfer was accepted, so recovery may safely replay.
+        Source and destination must be distinct, active, same-currency accounts
+        owned by the authenticated customer. Validate available funds, including
+        pending reservations, before accepting.
+        An accepted transfer starts pending and reserves funds without changing
+        posted balances. Poll getTransfer to observe its terminal state.
+        Idempotency keys are scoped to the customer and retained for at least
+        24 hours. The same key and body returns 200 with the same transfer ID and
+        its current state, without another reservation or movement of funds.
+        The same key with a different body returns 409 IDEMPOTENCY_CONFLICT.
+        Rejected requests do not reserve funds or create transfers.
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 128
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+            example:
+              sourceAccountId: acc-source
+              destinationAccountId: acc-destination
+              amountMinor: 12500
+              currency: EUR
+      responses:
+        '202':
+          description: New transfer accepted in pending state
+          headers:
+            Retry-After:
+              description: Suggested delay before polling, in seconds
+              schema:
+                type: integer
+                minimum: 0
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+              example:
+                transferId: transfer-demo-1
+                sourceAccountId: acc-source
+                destinationAccountId: acc-destination
+                amountMinor: 12500
+                currency: EUR
+                status: pending
+        '200':
+          description: Existing transfer for the same idempotency key and body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Idempotency key reused with a different request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                type: urn:banking:error:idempotency-conflict
+                title: Idempotency conflict
+                status: 409
+                code: IDEMPOTENCY_CONFLICT
+                detail: This key was already used with a different payload.
+        '422':
+          description: Business rejection; no balance or ledger effects
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                insufficientFunds:
+                  value:
+                    type: urn:banking:error:insufficient-funds
+                    title: Insufficient funds
+                    status: 422
+                    code: INSUFFICIENT_FUNDS
+                    detail: Available funds are less than amountMinor.
+                closedAccount:
+                  value:
+                    type: urn:banking:error:account-closed
+                    title: Account closed
+                    status: 422
+                    code: ACCOUNT_CLOSED
+                    detail: Both accounts must be active.
+                currencyMismatch:
+                  value:
+                    type: urn:banking:error:currency-mismatch
+                    title: Currency mismatch
+                    status: 422
+                    code: CURRENCY_MISMATCH
+                    detail: Both accounts and the request must use the same currency.
+  /transfers/{transferId}:
+    get:
+      operationId: getTransfer
+      summary: Read a transfer's current state
+      description: |
+        State transitions are pending -> completed or pending -> failed.
+        Terminal states never change. A failed transfer has a failureCode and
+        releases its reservation without changing balances or creating entries.
+        completed is visible only after both balances and ledger entries commit.
+        Only the owning customer may retrieve the transfer.
+      parameters:
+        - name: transferId
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        '200':
+          description: Current transfer state; a failed state includes failureCode
+          headers:
+            Retry-After:
+              description: Suggested polling delay in seconds when pending
+              schema:
+                type: integer
+                minimum: 0
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transfer'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  securitySchemes:
+    bearerHttpAuthentication:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    AccountId:
+      name: accountId
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    AccountQuery:
+      name: accountId
+      in: query
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    Cursor:
+      name: cursor
+      in: query
+      description: Omit or send empty for the first page; otherwise use nextCursor
+      schema:
+        type: string
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 2
+  schemas:
+    Account:
+      type: object
+      additionalProperties: false
+      required: [id, customerId, type, currency, status, balanceMinor]
+      properties:
+        id:
+          type: string
+          minLength: 1
+        customerId:
+          type: string
+          minLength: 1
+        type:
+          type: string
+          enum: [checking, savings]
+        currency:
+          type: string
+          enum: [EUR, USD, GBP]
+        status:
+          type: string
+          enum: [active, closed]
+        balanceMinor:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 9007199254740991
+    CreateAccountRequest:
+      type: object
+      additionalProperties: false
+      required: [customerId, type, currency, initialDepositMinor]
+      properties:
+        customerId:
+          type: string
+          minLength: 1
+        type:
+          type: string
+          enum: [checking, savings]
+        currency:
+          type: string
+          enum: [EUR, USD, GBP]
+        initialDepositMinor:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 9007199254740991
+    AccountPage:
+      type: object
+      additionalProperties: false
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/Account'
+        nextCursor:
+          type: string
+          nullable: true
+          minLength: 1
+    Balance:
+      type: object
+      additionalProperties: false
+      required: [accountId, currency, balanceMinor]
+      properties:
+        accountId:
+          type: string
+          minLength: 1
+        currency:
+          type: string
+          enum: [EUR, USD, GBP]
+        balanceMinor:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 9007199254740991
+    Transaction:
+      type: object
+      additionalProperties: false
+      required: [id, accountId, date, amountMinor, currency, description]
+      properties:
+        id:
+          type: string
+          minLength: 1
+        accountId:
+          type: string
+          minLength: 1
+        transferId:
+          type: string
+          minLength: 1
+        date:
+          type: string
+          format: date
+        amountMinor:
+          type: integer
+          format: int64
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+        currency:
+          type: string
+          enum: [EUR, USD, GBP]
+        description:
+          type: string
+    TransactionPage:
+      type: object
+      additionalProperties: false
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          maxItems: 100
+          items:
+            $ref: '#/components/schemas/Transaction'
+        nextCursor:
+          type: string
+          nullable: true
+          minLength: 1
+    TransferRequest:
+      type: object
+      additionalProperties: false
+      required: [sourceAccountId, destinationAccountId, amountMinor, currency]
+      properties:
+        sourceAccountId:
+          type: string
+          minLength: 1
+        destinationAccountId:
+          type: string
+          minLength: 1
+        amountMinor:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 9007199254740991
+        currency:
+          type: string
+          enum: [EUR, USD, GBP]
+    Transfer:
+      type: object
+      additionalProperties: false
+      required: [transferId, sourceAccountId, destinationAccountId, amountMinor, currency, status]
+      properties:
+        transferId:
+          type: string
+          minLength: 1
+        sourceAccountId:
+          type: string
+          minLength: 1
+        destinationAccountId:
+          type: string
+          minLength: 1
+        amountMinor:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 9007199254740991
+        currency:
+          type: string
+          enum: [EUR, USD, GBP]
+        status:
+          type: string
+          enum: [pending, completed, failed]
+        failureCode:
+          type: string
+          enum: [PROCESSING_FAILED]
+    Problem:
+      type: object
+      required: [type, title, status, code, detail]
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+          enum: [400, 401, 403, 404, 409, 422]
+        code:
+          type: string
+          enum:
+            - INVALID_REQUEST
+            - TOKEN_EXPIRED
+            - INVALID_TOKEN
+            - SESSION_REVOKED
+            - FORBIDDEN
+            - NOT_FOUND
+            - ACCOUNT_EXISTS
+            - ACCOUNT_NOT_CLOSABLE
+            - IDEMPOTENCY_CONFLICT
+            - INSUFFICIENT_FUNDS
+            - ACCOUNT_CLOSED
+            - CURRENCY_MISMATCH
+        detail:
+          type: string
+  responses:
+    AccountResult:
+      description: Account representation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Account'
+          example:
+            id: acc-source
+            customerId: customer-demo
+            type: checking
+            currency: EUR
+            status: active
+            balanceMinor: 50000
+    InvalidRequest:
+      description: Invalid fields, cursor, date range, or identical transfer accounts
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: urn:banking:error:invalid-request
+            title: Invalid request
+            status: 400
+            code: INVALID_REQUEST
+            detail: Request validation failed.
+    Unauthorized:
+      description: |
+        Authentication failed before any side effect. A revoked session takes
+        precedence over expiry. Only TOKEN_EXPIRED permits refresh recovery.
+      headers:
+        WWW-Authenticate:
+          schema:
+            type: string
+          example: Bearer
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          examples:
+            expired:
+              value:
+                type: urn:banking:error:token-expired
+                title: Token expired
+                status: 401
+                code: TOKEN_EXPIRED
+                detail: Refresh the session before retrying.
+            revoked:
+              value:
+                type: urn:banking:error:session-revoked
+                title: Session revoked
+                status: 401
+                code: SESSION_REVOKED
+                detail: The session has been revoked.
+            invalid:
+              value:
+                type: urn:banking:error:invalid-token
+                title: Invalid token
+                status: 401
+                code: INVALID_TOKEN
+                detail: Supply a valid access token.
+    Forbidden:
+      description: Resource belongs to another customer
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: urn:banking:error:forbidden
+            title: Forbidden
+            status: 403
+            code: FORBIDDEN
+            detail: The customer does not own this resource.
+    NotFound:
+      description: Account or transfer does not exist
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: urn:banking:error:not-found
+            title: Not found
+            status: 404
+            code: NOT_FOUND
+            detail: The requested resource does not exist.
+</con:content>
+      <con:type>https://swagger.io/openapiv3/specification</con:type>
+    </con:part>
+  </con:definitionCache>
+  <con:endpoints>
+    <con:endpoint>http://localhost:8082/</con:endpoint>
+    <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+  </con:endpoints>
+  <con:environmentSpec>
+    <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+      <con:authProfile>Inherit From Parent</con:authProfile>
+    </con:entry>
+  </con:environmentSpec>
+</con:interface>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:con="http://eviware.com/soapui/config" name="/balance" path="/balance" id="fe427a6d-3880-4507-bcbe-af1da95812cb">
+  <con:settings>
+    <con:setting id="fe427a6d-3880-4507-bcbe-af1da95812cbfileName">%2Fbalance</con:setting>
+  </con:settings>
+  <con:parameters/>
+  <con:method name="getBalance" id="f0d05382-04b3-4b5d-9a48-3d9021dfc504" method="GET">
+    <con:description>Retrieve an owned account's posted balance</con:description>
+    <con:settings/>
+    <con:parameters>
+      <con:parameter required="true">
+        <con:name>accountId</con:name>
+        <con:style>QUERY</con:style>
+      </con:parameter>
+    </con:parameters>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/json</con:mediaType>
+      <con:status>200</con:status>
+      <con:params/>
+      <con:description>Current posted balance</con:description>
+      <con:sampleContent>{
+  "accountId" : "acc-source",
+  "currency" : "EUR",
+  "balanceMinor" : 50000
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>401</con:status>
+      <con:params/>
+      <con:description>Authentication failed before any side effect. A revoked session takes
+precedence over expiry. Only TOKEN_EXPIRED permits refresh recovery.
+</con:description>
+      <con:sampleContent>{
+  "type" : "string",
+  "title" : "string",
+  "status" : 0,
+  "code" : "INVALID_REQUEST",
+  "detail" : "string"
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>403</con:status>
+      <con:params/>
+      <con:description>Resource belongs to another customer</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:forbidden",
+  "title" : "Forbidden",
+  "status" : 403,
+  "code" : "FORBIDDEN",
+  "detail" : "The customer does not own this resource."
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>404</con:status>
+      <con:params/>
+      <con:description>Account or transfer does not exist</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:not-found",
+  "title" : "Not found",
+  "status" : 404,
+  "code" : "NOT_FOUND",
+  "detail" : "The requested resource does not exist."
+}</con:sampleContent>
+    </con:representation>
+    <con:request name="Request 1" id="ab66d69d-876c-406b-88b1-ebc4a6c05c8a" mediaType="application/json">
+      <con:settings/>
+      <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+      <con:credentials>
+        <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+        <con:authType>No Authorization</con:authType>
+      </con:credentials>
+      <con:parameters/>
+      <con:environmentSpec>
+        <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+          <con:authProfile>Inherit From Parent</con:authProfile>
+        </con:entry>
+      </con:environmentSpec>
+    </con:request>
+    <con:environmentSpec>
+      <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+        <con:authProfile>Inherit From Parent</con:authProfile>
+      </con:entry>
+    </con:environmentSpec>
+  </con:method>
+  <con:environmentSpec>
+    <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+      <con:authProfile>Inherit From Parent</con:authProfile>
+    </con:entry>
+  </con:environmentSpec>
+</con:resource>

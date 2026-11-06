@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:testCase xmlns:con="http://eviware.com/soapui/config" id="8d63b981-e2d8-4d55-b9c0-73bd6f66f555" discardOkResults="false" failOnError="false" failTestCaseOnErrors="true" keepSession="false" name="createAccount" searchProperties="true" timeout="0">
+  <con:settings>
+    <con:setting id="8d63b981-e2d8-4d55-b9c0-73bd6f66f555fileName">createAccount</con:setting>
+  </con:settings>
+  <con:testStep type="restrequest" name="login" id="b60444fd-b92b-4394-84f8-5c86631f376f">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Bearer Authentication API" resourcePath="/login" methodName="loginUser" xsi:type="con:RestRequestStep">
+      <con:restRequest name="login" id="605ee612-bd9e-42dc-a8d1-a271f933b22c" mediaType="application/json">
+        <con:settings/>
+        <con:endpoint>http://localhost:8081</con:endpoint>
+        <con:request>{"username":"${#Env#username}","password":"${#Env#password}"}</con:request>
+        <con:originalUri>http://localhost/login</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="a592ebe8-9bb7-433b-9bb5-a7232066fbc9" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>200</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>Inherit From Parent</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:parameters/>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="restrequest" name="createAccount" id="a6cbbc25-ef57-43ac-a8fa-4a4ea5281bd8">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Banking Management API" resourcePath="/accounts/{accountId}" methodName="createAccount" xsi:type="con:RestRequestStep">
+      <con:restRequest name="createAccount" id="d030a44e-d95a-4a3d-8976-11a3486aee9b" mediaType="application/json">
+        <con:settings>
+          <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;con:entry key="Authorization" value="Bearer ${login#Response#$.access_token}" xmlns:con="http://eviware.com/soapui/config"/></con:setting>
+        </con:settings>
+        <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+        <con:request>{"customerId":"${#Env#customerId}","type":"${#Env#accountType}","currency":"${#Env#currency}","initialDepositMinor":${#Env#initialDepositMinor}}</con:request>
+        <con:originalUri>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0/accounts/</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="94855984-2789-466e-981e-0086e2d15567" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>201</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>Inherit From Parent</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:parameters>
+          <con:entry key="accountId" value="${#Env#accountId}"/>
+        </con:parameters>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="restrequest" name="readAccount" id="6ce36df6-15a6-46c8-84ad-d4f26fac221b">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Banking Management API" resourcePath="/accounts/{accountId}" methodName="getAccount" xsi:type="con:RestRequestStep">
+      <con:restRequest name="readAccount" id="67e58fa1-ccdc-47bb-ba8e-e0e265686433" mediaType="application/json">
+        <con:settings>
+          <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;con:entry key="Authorization" value="Bearer ${login#Response#$.access_token}" xmlns:con="http://eviware.com/soapui/config"/></con:setting>
+        </con:settings>
+        <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+        <con:request/>
+        <con:originalUri>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0/accounts/</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="f8b97cf0-67c7-4ba2-b93e-a237d8823115" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>200</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>Inherit From Parent</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:parameters>
+          <con:entry key="accountId" value="${createAccount#Response#$.id}"/>
+        </con:parameters>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="restrequest" name="logout" id="a81c8ccf-b7aa-4d06-a728-cec2ecfcb4cc">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Bearer Authentication API" resourcePath="/logout" methodName="logoutUser" xsi:type="con:RestRequestStep">
+      <con:restRequest name="logout" id="90b9f06c-e616-409c-834c-3c7f34e80bb9" mediaType="application/json">
+        <con:settings/>
+        <con:endpoint>http://localhost:8081</con:endpoint>
+        <con:request>{"token":"${login#Response#$.refresh_token}"}</con:request>
+        <con:originalUri>http://localhost/logout</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="cd9b1cf5-8deb-4900-ace2-5da7b8cfad20" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>204</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>Inherit From Parent</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:parameters/>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:properties/>
+  <con:reportParameters/>
+</con:testCase>

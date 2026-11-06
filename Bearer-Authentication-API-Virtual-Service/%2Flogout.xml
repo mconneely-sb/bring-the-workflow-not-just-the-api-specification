@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:restMockAction xmlns:con="http://eviware.com/soapui/config" name="/logout" method="POST" resourcePath="/logout" id="1b26f997-5ceb-41bf-a2c1-0f18f30e8a4c">
+  <con:settings>
+    <con:setting id="1b26f997-5ceb-41bf-a2c1-0f18f30e8a4cfileName">%2Flogout</con:setting>
+  </con:settings>
+  <con:dispatchStyle>SEQUENCE</con:dispatchStyle>
+  <con:dispatchConfig/>
+  <con:dispatchXPath/>
+  <con:requestRouteScript/>
+  <con:delayConfiguration/>
+  <con:response name="Response 1" id="bb3e6586-a5ee-4404-8995-ee0704cd5642" httpResponseStatus="204" dataSource="">
+    <con:settings/>
+    <con:responseContent/>
+  </con:response>
+  <con:response name="Response 2" id="1d0dc135-2dc8-4e1e-a302-3326ee378eca" httpResponseStatus="400" mediaType="application/problem+json" compressedBodyContent="aced00057372002f636f6d2e657669776172652e736f617075692e696d706c2e737570706f72742e436f6d7072657373656456616c7565000b8b02c748eeab0200035a000a636f6d707265737365644c000b636f6d7072657373696f6e74003d4c636f6d2f657669776172652f736f617075692f696d706c2f737570706f72742f436f6d7072657373656456616c756524436f6d7072657373696f6e3b5b0004646174617400025b427870007e72003b636f6d2e657669776172652e736f617075692e696d706c2e737570706f72742e436f6d7072657373656456616c756524436f6d7072657373696f6e00000000000000001200007872000e6a6176612e6c616e672e456e756d000000000000000012000078707400044e4f4e4570" dataSource="">
+    <con:settings/>
+    <con:responseContent>{
+  "type" : "urn:banking:error:invalid-request",
+  "title" : "Invalid request",
+  "status" : 400,
+  "code" : "INVALID_REQUEST",
+  "detail" : "A required field is missing or invalid."
+}</con:responseContent>
+  </con:response>
+  <con:response name="Response 3" id="eed47b84-b4a6-45bc-828b-d5acddd07ffa" httpResponseStatus="401" mediaType="application/problem+json" compressedBodyContent="aced00057372002f636f6d2e657669776172652e736f617075692e696d706c2e737570706f72742e436f6d7072657373656456616c7565000b8b02c748eeab0200035a000a636f6d707265737365644c000b636f6d7072657373696f6e74003d4c636f6d2f657669776172652f736f617075692f696d706c2f737570706f72742f436f6d7072657373656456616c756524436f6d7072657373696f6e3b5b0004646174617400025b427870007e72003b636f6d2e657669776172652e736f617075692e696d706c2e737570706f72742e436f6d7072657373656456616c756524436f6d7072657373696f6e00000000000000001200007872000e6a6176612e6c616e672e456e756d000000000000000012000078707400044e4f4e4570" dataSource="">
+    <con:settings/>
+    <con:responseContent>{
+  "type" : "string",
+  "title" : "string",
+  "status" : 0,
+  "code" : "INVALID_REQUEST",
+  "detail" : "string"
+}</con:responseContent>
+  </con:response>
+</con:restMockAction>

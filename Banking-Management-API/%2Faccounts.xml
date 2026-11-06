@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:con="http://eviware.com/soapui/config" name="/accounts" path="/accounts" id="8f35ae25-482b-47a4-962b-4f0a8f6daf68">
+  <con:settings>
+    <con:setting id="8f35ae25-482b-47a4-962b-4f0a8f6daf68fileName">%2Faccounts</con:setting>
+  </con:settings>
+  <con:parameters/>
+  <con:method name="listAccounts" id="23734baa-3249-45f8-a3c2-4030e19b98b1" method="GET">
+    <con:description>Returns accounts sorted by ID in a stable snapshot. An omitted or empty
+cursor starts a new snapshot. Subsequent cursors preserve that snapshot
+and the original filters. nextCursor is null on the final page.
+An empty result returns items [] and nextCursor null, not 404.
+The authenticated customer must own customerId, otherwise return 403.
+</con:description>
+    <con:settings/>
+    <con:parameters>
+      <con:parameter required="true">
+        <con:name>customerId</con:name>
+        <con:style>QUERY</con:style>
+      </con:parameter>
+      <con:parameter>
+        <con:name>status</con:name>
+        <con:style>QUERY</con:style>
+      </con:parameter>
+      <con:parameter>
+        <con:name>cursor</con:name>
+        <con:style>QUERY</con:style>
+        <con:description>Omit or send empty for the first page; otherwise use nextCursor</con:description>
+      </con:parameter>
+      <con:parameter>
+        <con:name>limit</con:name>
+        <con:value>2</con:value>
+        <con:style>QUERY</con:style>
+        <con:default>2</con:default>
+      </con:parameter>
+    </con:parameters>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/json</con:mediaType>
+      <con:status>200</con:status>
+      <con:params/>
+      <con:description>One page of accounts</con:description>
+      <con:sampleContent>{
+  "items" : [ {
+    "id" : "acc-source",
+    "customerId" : "customer-demo",
+    "type" : "checking",
+    "currency" : "EUR",
+    "status" : "active",
+    "balanceMinor" : 50000
+  } ],
+  "nextCursor" : "account-page-2"
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>400</con:status>
+      <con:params/>
+      <con:description>Invalid fields, cursor, date range, or identical transfer accounts</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:invalid-request",
+  "title" : "Invalid request",
+  "status" : 400,
+  "code" : "INVALID_REQUEST",
+  "detail" : "Request validation failed."
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>401</con:status>
+      <con:params/>
+      <con:description>Authentication failed before any side effect. A revoked session takes
+precedence over expiry. Only TOKEN_EXPIRED permits refresh recovery.
+</con:description>
+      <con:sampleContent>{
+  "type" : "string",
+  "title" : "string",
+  "status" : 0,
+  "code" : "INVALID_REQUEST",
+  "detail" : "string"
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>403</con:status>
+      <con:params/>
+      <con:description>Resource belongs to another customer</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:forbidden",
+  "title" : "Forbidden",
+  "status" : 403,
+  "code" : "FORBIDDEN",
+  "detail" : "The customer does not own this resource."
+}</con:sampleContent>
+    </con:representation>
+    <con:request name="Request 1" id="3e09441f-688e-4c64-8967-b6bb7041e247" mediaType="application/json">
+      <con:settings/>
+      <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+      <con:credentials>
+        <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+        <con:authType>No Authorization</con:authType>
+      </con:credentials>
+      <con:parameters/>
+      <con:environmentSpec>
+        <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+          <con:authProfile>Inherit From Parent</con:authProfile>
+        </con:entry>
+      </con:environmentSpec>
+    </con:request>
+    <con:environmentSpec>
+      <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+        <con:authProfile>Inherit From Parent</con:authProfile>
+      </con:entry>
+    </con:environmentSpec>
+  </con:method>
+  <con:environmentSpec>
+    <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+      <con:authProfile>Inherit From Parent</con:authProfile>
+    </con:entry>
+  </con:environmentSpec>
+</con:resource>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:testCase xmlns:con="http://eviware.com/soapui/config" id="c3852b11-215d-4e62-b829-8b3e0757d9aa" discardOkResults="false" failOnError="false" failTestCaseOnErrors="true" keepSession="false" name="/refresh Test Case" searchProperties="true" timeout="0">
+  <con:description>The test case generated for the REST resource [/refresh] located at [/refresh]</con:description>
+  <con:settings>
+    <con:setting id="c3852b11-215d-4e62-b829-8b3e0757d9aafileName">%2Frefresh-Test-Case</con:setting>
+  </con:settings>
+  <con:testStep type="restrequest" name="Request 1" id="3be034f7-4951-4dcf-a497-15bfbed0e22c">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Bearer Authentication API" resourcePath="/refresh" methodName="refreshSession" xsi:type="con:RestRequestStep">
+      <con:restRequest name="Request 1" id="01130b6d-4b5f-408b-8f26-af59b1f1a482" mediaType="application/json">
+        <con:settings/>
+        <con:endpoint>http://localhost:8081</con:endpoint>
+        <con:request>{\r
+  "refresh_token" : "synthetic-refresh-token-1"\r
+}</con:request>
+        <con:originalUri>http://localhost/refresh</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="2d0bb1d7-daad-4fde-b63d-3023ff92cec2" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>200</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:assertion type="SwaggerComplianceAssertion" id="92b1b573-7c94-4950-b7d7-5656f712a970" name="Swagger Compliance Assertion">
+          <con:configuration/>
+        </con:assertion>
+        <con:assertion type="Response SLA Assertion" id="8f8420a6-8e6b-454f-b4d8-5b6dbbd35c9f" name="Response SLA">
+          <con:configuration/>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:parameters/>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:properties/>
+  <con:reportParameters/>
+  <con:environmentSpec>
+    <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+      <con:authProfile>Inherit From Parent</con:authProfile>
+    </con:entry>
+  </con:environmentSpec>
+  <con:tagId>ca6ab3c6-34e3-4fa9-8482-404db4bb3d97</con:tagId>
+</con:testCase>

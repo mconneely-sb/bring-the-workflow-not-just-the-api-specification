@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:testSuite xmlns:con="http://eviware.com/soapui/config" id="fa4c13b4-77f9-464a-a9a5-af902a84a04c" name="Banking Management API - all tests">
+  <con:settings id="fc4136e4-7496-4c03-befd-99f64e9fee76">
+    <con:setting id="fa4c13b4-77f9-464a-a9a5-af902a84a04cfileName">Banking-Management-API---all-tests</con:setting>
+  </con:settings>
+  <con:runType>SEQUENTIAL</con:runType>
+  <con:properties/>
+  <con:reportParameters/>
+  <con:environmentSpec>
+    <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+      <con:authProfile>Inherit From Parent</con:authProfile>
+    </con:entry>
+  </con:environmentSpec>
+</con:testSuite>

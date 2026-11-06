@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:con="http://eviware.com/soapui/config" name="/transfers" path="/transfers" id="a8b3def9-eba3-4ef4-a469-aeb6fe0ec2a8">
+  <con:settings>
+    <con:setting id="a8b3def9-eba3-4ef4-a469-aeb6fe0ec2a8fileName">%2Ftransfers</con:setting>
+  </con:settings>
+  <con:parameters/>
+  <con:method name="submitTransfer" id="ba6b4b7d-900a-4c60-aaba-25fbdd16d6f0" method="POST">
+    <con:description>Validate authentication before any side effect. A 401 TOKEN_EXPIRED
+guarantees no transfer was accepted, so recovery may safely replay.
+Source and destination must be distinct, active, same-currency accounts
+owned by the authenticated customer. Validate available funds, including
+pending reservations, before accepting.
+An accepted transfer starts pending and reserves funds without changing
+posted balances. Poll getTransfer to observe its terminal state.
+Idempotency keys are scoped to the customer and retained for at least
+24 hours. The same key and body returns 200 with the same transfer ID and
+its current state, without another reservation or movement of funds.
+The same key with a different body returns 409 IDEMPOTENCY_CONFLICT.
+Rejected requests do not reserve funds or create transfers.
+</con:description>
+    <con:settings/>
+    <con:parameters>
+      <con:parameter required="true">
+        <con:name>Idempotency-Key</con:name>
+        <con:style>HEADER</con:style>
+      </con:parameter>
+    </con:parameters>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/json</con:mediaType>
+      <con:status>202</con:status>
+      <con:params/>
+      <con:description>New transfer accepted in pending state</con:description>
+      <con:sampleContent>{
+  "transferId" : "transfer-demo-1",
+  "sourceAccountId" : "acc-source",
+  "destinationAccountId" : "acc-destination",
+  "amountMinor" : 12500,
+  "currency" : "EUR",
+  "status" : "pending"
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/json</con:mediaType>
+      <con:status>200</con:status>
+      <con:params/>
+      <con:description>Existing transfer for the same idempotency key and body</con:description>
+      <con:sampleContent>{
+  "transferId" : "string",
+  "sourceAccountId" : "string",
+  "destinationAccountId" : "string",
+  "amountMinor" : 0,
+  "currency" : "EUR",
+  "status" : "pending",
+  "failureCode" : "PROCESSING_FAILED"
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>400</con:status>
+      <con:params/>
+      <con:description>Invalid fields, cursor, date range, or identical transfer accounts</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:invalid-request",
+  "title" : "Invalid request",
+  "status" : 400,
+  "code" : "INVALID_REQUEST",
+  "detail" : "Request validation failed."
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>401</con:status>
+      <con:params/>
+      <con:description>Authentication failed before any side effect. A revoked session takes
+precedence over expiry. Only TOKEN_EXPIRED permits refresh recovery.
+</con:description>
+      <con:sampleContent>{
+  "type" : "string",
+  "title" : "string",
+  "status" : 0,
+  "code" : "INVALID_REQUEST",
+  "detail" : "string"
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>403</con:status>
+      <con:params/>
+      <con:description>Resource belongs to another customer</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:forbidden",
+  "title" : "Forbidden",
+  "status" : 403,
+  "code" : "FORBIDDEN",
+  "detail" : "The customer does not own this resource."
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>404</con:status>
+      <con:params/>
+      <con:description>Account or transfer does not exist</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:not-found",
+  "title" : "Not found",
+  "status" : 404,
+  "code" : "NOT_FOUND",
+  "detail" : "The requested resource does not exist."
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>409</con:status>
+      <con:params/>
+      <con:description>Idempotency key reused with a different request</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:idempotency-conflict",
+  "title" : "Idempotency conflict",
+  "status" : 409,
+  "code" : "IDEMPOTENCY_CONFLICT",
+  "detail" : "This key was already used with a different payload."
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>422</con:status>
+      <con:params/>
+      <con:description>Business rejection; no balance or ledger effects</con:description>
+      <con:sampleContent>{
+  "type" : "string",
+  "title" : "string",
+  "status" : 0,
+  "code" : "INVALID_REQUEST",
+  "detail" : "string"
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="REQUEST">
+      <con:mediaType>application/json</con:mediaType>
+      <con:params/>
+      <con:sampleContent>{
+  "sourceAccountId" : "acc-source",
+  "destinationAccountId" : "acc-destination",
+  "amountMinor" : 12500,
+  "currency" : "EUR"
+}</con:sampleContent>
+    </con:representation>
+    <con:request name="Request 1" id="d0bb3d25-9760-40c0-8239-e8594385c8f8" mediaType="application/json">
+      <con:settings/>
+      <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+      <con:request>{\r
+  "sourceAccountId" : "acc-source",\r
+  "destinationAccountId" : "acc-destination",\r
+  "amountMinor" : 12500,\r
+  "currency" : "EUR"\r
+}</con:request>
+      <con:credentials>
+        <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+        <con:authType>No Authorization</con:authType>
+      </con:credentials>
+      <con:parameters/>
+      <con:environmentSpec>
+        <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+          <con:authProfile>Inherit From Parent</con:authProfile>
+        </con:entry>
+      </con:environmentSpec>
+    </con:request>
+    <con:environmentSpec>
+      <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+        <con:authProfile>Inherit From Parent</con:authProfile>
+      </con:entry>
+    </con:environmentSpec>
+  </con:method>
+  <con:environmentSpec>
+    <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+      <con:authProfile>Inherit From Parent</con:authProfile>
+    </con:entry>
+  </con:environmentSpec>
+</con:resource>

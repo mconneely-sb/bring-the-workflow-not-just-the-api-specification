@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:con="http://eviware.com/soapui/config" name="/logout" path="/logout" id="e51346b0-c935-4fb7-b8d6-28f1a79b92bb">
+  <con:settings>
+    <con:setting id="e51346b0-c935-4fb7-b8d6-28f1a79b92bbfileName">%2Flogout</con:setting>
+  </con:settings>
+  <con:parameters/>
+  <con:method name="logoutUser" id="0e27f9f9-a701-4fa0-9f47-dcdb562998c9" method="POST">
+    <con:description>The body token must be the current refresh token. A valid refresh token
+permits cleanup even if the access token has expired. A first successful
+logout returns 204 with no response body. Already revoked sessions return
+401 SESSION_REVOKED. Invalid or rotated tokens return INVALID_REFRESH_TOKEN.
+</con:description>
+    <con:settings/>
+    <con:parameters/>
+    <con:representation type="RESPONSE">
+      <con:status>204</con:status>
+      <con:params/>
+      <con:description>Session revoked; no response body</con:description>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>400</con:status>
+      <con:params/>
+      <con:description>Missing or invalid request fields</con:description>
+      <con:sampleContent>{
+  "type" : "urn:banking:error:invalid-request",
+  "title" : "Invalid request",
+  "status" : 400,
+  "code" : "INVALID_REQUEST",
+  "detail" : "A required field is missing or invalid."
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="RESPONSE">
+      <con:mediaType>application/problem+json</con:mediaType>
+      <con:status>401</con:status>
+      <con:params/>
+      <con:description>Invalid refresh token or already revoked session</con:description>
+      <con:sampleContent>{
+  "type" : "string",
+  "title" : "string",
+  "status" : 0,
+  "code" : "INVALID_REQUEST",
+  "detail" : "string"
+}</con:sampleContent>
+    </con:representation>
+    <con:representation type="REQUEST">
+      <con:mediaType>application/json</con:mediaType>
+      <con:params/>
+      <con:sampleContent>{
+  "token" : "string"
+}</con:sampleContent>
+    </con:representation>
+    <con:request name="Request 1" id="90b9f06c-e616-409c-834c-3c7f34e80bb9" mediaType="application/json">
+      <con:settings/>
+      <con:endpoint>http://localhost:8081</con:endpoint>
+      <con:request>{\r
+  "token" : "string"\r
+}</con:request>
+      <con:credentials>
+        <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+        <con:authType>No Authorization</con:authType>
+      </con:credentials>
+      <con:parameters/>
+      <con:environmentSpec>
+        <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+          <con:authProfile>Inherit From Parent</con:authProfile>
+        </con:entry>
+      </con:environmentSpec>
+    </con:request>
+    <con:environmentSpec>
+      <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+        <con:authProfile>Inherit From Parent</con:authProfile>
+      </con:entry>
+    </con:environmentSpec>
+  </con:method>
+  <con:environmentSpec>
+    <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+      <con:authProfile>Inherit From Parent</con:authProfile>
+    </con:entry>
+  </con:environmentSpec>
+</con:resource>

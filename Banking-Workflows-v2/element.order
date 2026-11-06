@@ -1,0 +1,6 @@
+listCustomerAccounts.xml
+createAccount.xml
+updateAccount.xml
+inspectAccount.xml
+transferBetweenAccounts.xml
+rejectInsufficientFundsTransfer.xml

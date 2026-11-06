@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:testCase xmlns:con="http://eviware.com/soapui/config" id="118266b3-31ca-4c47-b95f-6c96abe89cd3" discardOkResults="false" failOnError="false" failTestCaseOnErrors="true" keepSession="false" name="/transfers/{transferId} Test Case" searchProperties="true" timeout="0">
+  <con:description>The test case generated for the REST resource [/transfers/{transferId}] located at [/transfers/{transferId}]</con:description>
+  <con:settings>
+    <con:setting id="118266b3-31ca-4c47-b95f-6c96abe89cd3fileName">%2Ftransfers%2F%7BtransferId%7D-Test-Case</con:setting>
+  </con:settings>
+  <con:testStep type="restrequest" name="Request 1" id="ea06697a-def1-4225-918a-884a71c5f2eb">
+    <con:settings/>
+    <con:config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" service="Banking Management API" resourcePath="/transfers/{transferId}" methodName="getTransfer" xsi:type="con:RestRequestStep">
+      <con:restRequest name="Request 1" id="b825d10a-0582-46b0-93f8-89a9861b89e4" mediaType="application/json">
+        <con:settings/>
+        <con:endpoint>https://virtserver.swaggerhub.com/MConneely/banking-management-api/2.0.0</con:endpoint>
+        <con:request/>
+        <con:originalUri>http://localhost/transfers/</con:originalUri>
+        <con:assertion type="Valid HTTP Status Codes" id="437ffd84-30a9-4712-8007-58aba6d3f270" name="Valid HTTP Status Codes">
+          <con:settings/>
+          <con:configuration>
+            <codes>200</codes>
+          </con:configuration>
+        </con:assertion>
+        <con:assertion type="SwaggerComplianceAssertion" id="4cea0474-d20c-4a30-a300-87fb6d6db530" name="Swagger Compliance Assertion">
+          <con:configuration/>
+        </con:assertion>
+        <con:assertion type="Response SLA Assertion" id="3330a683-e4b7-4646-94dc-92e2a6b45d97" name="Response SLA">
+          <con:configuration/>
+        </con:assertion>
+        <con:credentials>
+          <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
+          <con:authType>No Authorization</con:authType>
+        </con:credentials>
+        <con:parameters/>
+        <con:environmentSpec>
+          <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+            <con:authProfile>Inherit From Parent</con:authProfile>
+          </con:entry>
+        </con:environmentSpec>
+      </con:restRequest>
+    </con:config>
+  </con:testStep>
+  <con:properties/>
+  <con:reportParameters/>
+  <con:environmentSpec>
+    <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+      <con:authProfile>Inherit From Parent</con:authProfile>
+    </con:entry>
+  </con:environmentSpec>
+  <con:tagId>ca6ab3c6-34e3-4fa9-8482-404db4bb3d97</con:tagId>
+</con:testCase>

@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:interface xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:con="http://eviware.com/soapui/config" xsi:type="con:RestService" id="72e037ce-0a43-49c5-a5de-70da75d090a2" lastUpdated="2026-10-20T16:04:11.975+01:00" name="Bearer Authentication API" type="rest_ex" wadlVersion="https://swagger.io/openapiv3/specification" definitionUrl="file:/C:/Work/claude-work/readyapi-arrazo/BearerAuthenticationAPI-2.0.0.yaml">
+  <con:description>Stateful authentication contract for the banking workflow example.
+Login creates a session. Refresh rotates both tokens, invalidating the old
+refresh token and access token atomically. The session ID stays unchanged.
+Logout revokes the entire session, including every token issued for it.
+Examples are synthetic, nonfunctional fixtures, not credentials.
+This file does not deploy a service. Configure an isolated implementation
+or stateful mock; static auto-mocking does not implement these semantics.
+</con:description>
+  <con:settings id="cbea78bc-1185-4b4f-a676-370f4041cc52">
+    <con:setting id="72e037ce-0a43-49c5-a5de-70da75d090a2fileName">Bearer-Authentication-API</con:setting>
+  </con:settings>
+  <con:definitionCache type="TEXT" rootPart="file:/C:/Work/claude-work/readyapi-arrazo/BearerAuthenticationAPI-2.0.0.yaml">
+    <con:part>
+      <con:url>file:/C:/Work/claude-work/readyapi-arrazo/BearerAuthenticationAPI-2.0.0.yaml</con:url>
+      <con:content>openapi: 3.0.3
+info:
+  title: Bearer Authentication API
+  version: 2.0.0
+  description: |
+    Stateful authentication contract for the banking workflow example.
+    Login creates a session. Refresh rotates both tokens, invalidating the old
+    refresh token and access token atomically. The session ID stays unchanged.
+    Logout revokes the entire session, including every token issued for it.
+    Examples are synthetic, nonfunctional fixtures, not credentials.
+    This file does not deploy a service. Configure an isolated implementation
+    or stateful mock; static auto-mocking does not implement these semantics.
+servers:
+  - url: http://localhost:8081
+    description: Isolated authentication test service; must be supplied separately
+tags:
+  - name: authentication
+paths:
+  /login:
+    post:
+      operationId: loginUser
+      tags: [authentication]
+      summary: Create a session and issue access and refresh tokens
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              username: demo-user
+              password: not-a-real-password
+      responses:
+        '200':
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+              example:
+                access_token: synthetic-access-token-1
+                refresh_token: synthetic-refresh-token-1
+                token_type: Bearer
+                expires_in: 300
+                session_id: session-demo-1
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: Invalid credentials
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                type: urn:banking:error:invalid-credentials
+                title: Invalid credentials
+                status: 401
+                code: INVALID_CREDENTIALS
+                detail: The username or password is incorrect.
+  /refresh:
+    post:
+      operationId: refreshSession
+      tags: [authentication]
+      summary: Rotate tokens for an active session
+      description: |
+        Accepts a valid, unused refresh token, including when its access token
+        has expired. Returns new access and refresh tokens for the same session.
+        Both old tokens become invalid. A refresh token is single-use; a replay
+        returns INVALID_REFRESH_TOKEN. Revoked sessions return SESSION_REVOKED.
+        Clients must not blindly retry refresh after an ambiguous network failure.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+            example:
+              refresh_token: synthetic-refresh-token-1
+      responses:
+        '200':
+          description: Tokens rotated atomically
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+              example:
+                access_token: synthetic-access-token-2
+                refresh_token: synthetic-refresh-token-2
+                token_type: Bearer
+                expires_in: 300
+                session_id: session-demo-1
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: Invalid refresh token or revoked session
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                invalidRefreshToken:
+                  value:
+                    type: urn:banking:error:invalid-refresh-token
+                    title: Invalid refresh token
+                    status: 401
+                    code: INVALID_REFRESH_TOKEN
+                    detail: The refresh token is expired, invalid, or already used.
+                revokedSession:
+                  value:
+                    type: urn:banking:error:session-revoked
+                    title: Session revoked
+                    status: 401
+                    code: SESSION_REVOKED
+                    detail: The session has been revoked.
+  /logout:
+    post:
+      operationId: logoutUser
+      tags: [authentication]
+      summary: Revoke a session and all its tokens
+      description: |
+        The body token must be the current refresh token. A valid refresh token
+        permits cleanup even if the access token has expired. A first successful
+        logout returns 204 with no response body. Already revoked sessions return
+        401 SESSION_REVOKED. Invalid or rotated tokens return INVALID_REFRESH_TOKEN.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [token]
+              properties:
+                token:
+                  type: string
+                  minLength: 1
+                  description: Current refresh token, not the access token
+      responses:
+        '204':
+          description: Session revoked; no response body
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          description: Invalid refresh token or already revoked session
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              examples:
+                revokedSession:
+                  value:
+                    type: urn:banking:error:session-revoked
+                    title: Session revoked
+                    status: 401
+                    code: SESSION_REVOKED
+                    detail: The session has already been revoked.
+                invalidRefreshToken:
+                  value:
+                    type: urn:banking:error:invalid-refresh-token
+                    title: Invalid refresh token
+                    status: 401
+                    code: INVALID_REFRESH_TOKEN
+                    detail: Supply the latest refresh token.
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          format: password
+          minLength: 1
+          writeOnly: true
+    RefreshRequest:
+      type: object
+      additionalProperties: false
+      required: [refresh_token]
+      properties:
+        refresh_token:
+          type: string
+          minLength: 1
+    TokenResponse:
+      type: object
+      additionalProperties: false
+      required: [access_token, refresh_token, token_type, expires_in, session_id]
+      properties:
+        access_token:
+          type: string
+          minLength: 1
+        refresh_token:
+          type: string
+          minLength: 1
+        token_type:
+          type: string
+          enum: [Bearer]
+        expires_in:
+          type: integer
+          minimum: 1
+          description: Access-token lifetime in seconds
+        session_id:
+          type: string
+          minLength: 1
+    Problem:
+      type: object
+      required: [type, title, status, code, detail]
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+          enum: [400, 401]
+        code:
+          type: string
+          enum: [INVALID_REQUEST, INVALID_CREDENTIALS, INVALID_REFRESH_TOKEN, SESSION_REVOKED]
+        detail:
+          type: string
+  responses:
+    BadRequest:
+      description: Missing or invalid request fields
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: urn:banking:error:invalid-request
+            title: Invalid request
+            status: 400
+            code: INVALID_REQUEST
+            detail: A required field is missing or invalid.
+</con:content>
+      <con:type>https://swagger.io/openapiv3/specification</con:type>
+    </con:part>
+  </con:definitionCache>
+  <con:endpoints>
+    <con:endpoint>http://localhost:8081</con:endpoint>
+    <con:endpoint>http://localhost:8081/</con:endpoint>
+  </con:endpoints>
+  <con:environmentSpec>
+    <con:entry environmentId="68d4a8b0-5218-4ea4-b3cc-99a246e1da53">
+      <con:authProfile>Inherit From Parent</con:authProfile>
+    </con:entry>
+  </con:environmentSpec>
+</con:interface>
